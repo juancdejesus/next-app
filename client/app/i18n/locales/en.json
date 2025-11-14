@@ -1,0 +1,32 @@
+{
+  "app": {
+    "name": "Data Update Portal"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "upload": "Upload",
+    "jobs": "Jobs",
+    "approvals": "Approvals",
+    "templates": "Templates",
+    "items": "Items",
+    "settings": "Settings",
+    "help": "Help"
+  },
+  "breadcrumb": {
+    "home": "Home"
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "language": "Language",
+    "logout": "Logout"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Spanish"
+  },
+  "user": {
+    "name": "John Smith",
+    "role": "Global Submitter"
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Layout, Menu, Avatar, Dropdown, Badge, Breadcrumb, theme } from 'antd';
 import {
@@ -14,9 +14,12 @@ import {
   BellOutlined,
   DatabaseOutlined,
   AppstoreOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import { useTranslation } from 'react-i18next';
 import ThemeToggle from './ThemeToggle';
+import '../i18n/config';
 
 const { Header, Sider, Content } = Layout;
 
@@ -48,28 +51,29 @@ const keyToRouteMap: Record<string, string> = {
   'help': '/help',
 };
 
-// Get page title from pathname
-const getPageTitle = (path: string): string => {
-  const titleMap: Record<string, string> = {
-    '/': 'Dashboard',
-    '/upload': 'Upload',
-    '/jobs': 'Jobs',
-    '/approvals': 'Approvals',
-    '/templates': 'Templates',
-    '/items': 'Items',
-    '/settings': 'Settings',
-    '/help': 'Help',
-  };
-  return titleMap[path] || 'Dashboard';
-};
-
 export default function AppLayout({ children }: AppLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  // Map pathname to translation key
+  const getPageTitleKey = (path: string): string => {
+    const keyMap: Record<string, string> = {
+      '/': 'menu.dashboard',
+      '/upload': 'menu.upload',
+      '/jobs': 'menu.jobs',
+      '/approvals': 'menu.approvals',
+      '/templates': 'menu.templates',
+      '/items': 'menu.items',
+      '/settings': 'menu.settings',
+      '/help': 'menu.help',
+    };
+    return keyMap[path] || 'menu.dashboard';
+  };
 
   // Get the selected key directly from pathname - no state needed
   const selectedKey = routeToKeyMap[pathname] || '1';
@@ -86,62 +90,83 @@ export default function AppLayout({ children }: AppLayoutProps) {
     {
       key: '1',
       icon: <DashboardOutlined />,
-      label: 'Dashboard',
+      label: t('menu.dashboard'),
       onClick: () => handleMenuClick('1'),
     },
     {
       key: '2',
       icon: <CloudUploadOutlined />,
-      label: 'Upload',
+      label: t('menu.upload'),
       onClick: () => handleMenuClick('2'),
     },
     {
       key: '3',
       icon: <FolderOpenOutlined />,
-      label: 'Jobs',
+      label: t('menu.jobs'),
       onClick: () => handleMenuClick('3'),
     },
     {
       key: '4',
       icon: <CheckSquareOutlined />,
-      label: 'Approvals',
+      label: t('menu.approvals'),
       onClick: () => handleMenuClick('4'),
     },
     {
       key: '5',
       icon: <FileTextOutlined />,
-      label: 'Templates',
+      label: t('menu.templates'),
       onClick: () => handleMenuClick('5'),
     },
     {
       key: '6',
       icon: <AppstoreOutlined />,
-      label: 'Items',
+      label: t('menu.items'),
       onClick: () => handleMenuClick('6'),
     },
     {
       key: '7',
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: t('menu.settings'),
       onClick: () => handleMenuClick('7'),
     },
   ];
 
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
-      label: 'Profile',
+      label: t('userMenu.profile'),
     },
     {
       key: 'settings',
-      label: 'Settings',
+      label: t('userMenu.settings'),
+    },
+    {
+      key: 'language',
+      label: t('userMenu.language'),
+      icon: <GlobalOutlined />,
+      children: [
+        {
+          key: 'en',
+          label: t('language.english'),
+          onClick: () => changeLanguage('en'),
+        },
+        {
+          key: 'es',
+          label: t('language.spanish'),
+          onClick: () => changeLanguage('es'),
+        },
+      ],
     },
     {
       type: 'divider',
     },
     {
       key: 'logout',
-      label: 'Logout',
+      label: t('userMenu.logout'),
     },
   ];
 
@@ -180,15 +205,27 @@ export default function AppLayout({ children }: AppLayoutProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
             }}
           >
             <DatabaseOutlined style={{ color: 'white', fontSize: 18 }} />
           </div>
-          {!collapsed && (
-            <h1 style={{ color: 'white', margin: 0, fontSize: 16, fontWeight: 600 }}>
-              Data Update Portal
-            </h1>
-          )}
+          <h1
+            style={{
+              color: 'white',
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 600,
+              opacity: collapsed ? 0 : 1,
+              transition: 'opacity 0.3s ease-in-out',
+              transitionDelay: collapsed ? '0s' : '0.2s',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              width: collapsed ? 0 : 'auto',
+            }}
+          >
+            {t('app.name')}
+          </h1>
         </div>
         <Menu
           theme="dark"
@@ -205,7 +242,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               {
                 key: 'help',
                 icon: <QuestionCircleOutlined />,
-                label: 'Help',
+                label: t('menu.help'),
                 onClick: () => handleMenuClick('help'),
               },
             ]}
@@ -226,10 +263,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <Breadcrumb
             items={[
               {
-                title: 'Home',
+                title: t('breadcrumb.home'),
               },
               {
-                title: getPageTitle(pathname),
+                title: t(getPageTitleKey(pathname)),
               },
             ]}
           />
@@ -242,8 +279,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
                 <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>John Smith</div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>Global Submitter</div>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{t('user.name')}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>{t('user.role')}</div>
                 </div>
                 <Avatar src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyvO8dEbiL0_-6snr-tnpdQwsVDCKfE3lcZyKUY7gqAl9BhWk5iLFI9pXlqDlgWkhmC1OZoemI30jKyxfQw2xCgj768N1mQRxZUIkAqG6imhRVHvxuxu93TMTlb3TUzrZRacK-vmGdhv55KkHbJDvfemwPnuUalnesul0bo1J5dQMe0Mkq2SGQ9axisPUAvv__yyq44XrOXcpNtlI02ESjWzpmSpnutgTIAOeLaNuWIXOVozCXNfmNdcCztB3NmpQsXeoB2FYiKcru" />
               </div>

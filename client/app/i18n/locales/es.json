@@ -1,0 +1,32 @@
+{
+  "app": {
+    "name": "Portal de Actualización de Datos"
+  },
+  "menu": {
+    "dashboard": "Tablero",
+    "upload": "Cargar",
+    "jobs": "Trabajos",
+    "approvals": "Aprobaciones",
+    "templates": "Plantillas",
+    "items": "Elementos",
+    "settings": "Configuración",
+    "help": "Ayuda"
+  },
+  "breadcrumb": {
+    "home": "Inicio"
+  },
+  "userMenu": {
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "language": "Idioma",
+    "logout": "Cerrar sesión"
+  },
+  "language": {
+    "english": "Inglés",
+    "spanish": "Español"
+  },
+  "user": {
+    "name": "John Smith",
+    "role": "Remitente Global"
+  }
+}
