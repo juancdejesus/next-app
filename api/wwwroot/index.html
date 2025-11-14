@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Pulse - Coming Soon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animation for loading dots */
+        @keyframes bounce-delay {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+
+            40% {
+                transform: scale(1.0);
+                opacity: 1;
+            }
+        }
+
+        .dot-1 {
+            animation: bounce-delay 1.4s infinite ease-in-out both;
+            animation-delay: -0.32s;
+        }
+
+        .dot-2 {
+            animation: bounce-delay 1.4s infinite ease-in-out both;
+            animation-delay: -0.16s;
+        }
+
+        .dot-3 {
+            animation: bounce-delay 1.4s infinite ease-in-out both;
+        }
+
+        /* Custom animation for subtle heading pulse */
+        @keyframes subtle-pulse {
+            0%, 100% {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+
+        .pulsate {
+            animation: subtle-pulse 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sky-400 to-blue-600 text-white font-sans text-center p-4">
+
+    <div class="absolute top-4 left-4 text-2xl text-white font-semibold">
+        New Project
+    </div>
+
+    <div class="max-w-lg">
+
+        <div class="mb-8">
+            <div class="flex justify-center space-x-2">
+                <div class="w-3 h-3 md:w-4 md:h-4 bg-white rounded-full dot-1"></div>
+                <div class="w-3 h-3 md:w-4 md:h-4 bg-white rounded-full dot-2"></div>
+                <div class="w-3 h-3 md:w-4 md:h-4 bg-white rounded-full dot-3"></div>
+            </div>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 pulsate">
+            Coming Soon!
+        </h1>
+
+        <p class="text-lg md:text-xl mb-8 px-4">
+            This application is still under development. We're working on bringing you something great. Please check back later!
+        </p>
+
+        <p class="text-sm text-blue-100">
+            Thanks for your patience.
+        </p>
+
+    </div>
+</body>
+</html>

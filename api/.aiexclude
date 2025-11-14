@@ -1,0 +1,29 @@
+# .aiexclude - Gemini context exclusion file
+
+# Exclude all build output folders
+[Bb]in/
+[Oo]bj/
+
+# Specifically exclude the release build output.
+# While the above line handles this, being explicit can also be useful.
+bin/release/
+
+# Exclude user-specific files
+*.user
+*.suo
+
+# Exclude Visual Studio directory
+.vs/
+
+# Exclude dependency directories
+packages/
+
+# Exclude log files
+*.log
+
+# Exclude generated documentation files
+**/docs/api/
+
+# Exclude environment-specific configuration that might contain secrets
+appsettings.Development.json
+secrets.json
