@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Card, message, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm } from 'antd';
+import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/AppLayout';
 import dayjs from 'dayjs';
+
 
 interface User {
   id: number;
@@ -25,7 +26,8 @@ export default function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
-
+  const { message } = App.useApp(); 
+  
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -89,9 +91,10 @@ export default function UsersPage() {
         close_date: values.close_date ? values.close_date.toISOString() : null,
       };
 
-      const url = editingUser ? `${apiUrl}/user/${editingUser.id}` : `${apiUrl}/user`;
+      const url = editingUser ? `${apiUrl}/users/${editingUser.id}` : `${apiUrl}/users`;
       const method = editingUser ? 'PUT' : 'POST';
 
+      console.log(apiUrl)
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -183,7 +186,7 @@ export default function UsersPage() {
             icon={<EditOutlined />}
             onClick={() => showEditModal(record)}
           >
-            {t('users.table.edit')}
+            {/* {t('users.table.edit')} */}
           </Button>
           <Popconfirm
             title={t('users.deleteConfirmTitle')}
@@ -197,7 +200,7 @@ export default function UsersPage() {
               danger
               icon={<DeleteOutlined />}
             >
-              {t('users.table.delete')}
+              {/* {t('users.table.delete')} */}
             </Button>
           </Popconfirm>
         </div>

@@ -263,7 +263,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           />
         </div>
       </Sider>
-      <Layout style={{ marginLeft: collapsed ? 80 : 256, transition: 'all 0.2s' }}>
+      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'all 0.2s' }}>
         <Header
           style={{
             padding: '0 24px',
