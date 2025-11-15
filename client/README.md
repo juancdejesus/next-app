@@ -88,22 +88,27 @@ Currently, this project doesn't require environment variables for basic function
 
 ```
 client-app/
-├── app/                          # Next.js App Router directory
-│   ├── approvals/               # Approvals page
+├── src/                         # Source code directory
+│   ├── app/                     # Next.js App Router directory
+│   │   ├── approvals/           # Approvals page
+│   │   ├── dashboard/           # Dashboard page
+│   │   ├── help/                # Help/documentation page
+│   │   ├── items/               # Items management page
+│   │   ├── jobs/                # Jobs listing page
+│   │   ├── settings/            # Settings page
+│   │   ├── templates/           # Templates library page
+│   │   ├── upload/              # File upload page
+│   │   ├── users/               # Users management page
+│   │   ├── globals.css          # Global styles and CSS variables
+│   │   ├── layout.tsx           # Root layout (metadata, providers)
+│   │   └── page.tsx             # Home page (redirects to dashboard)
 │   ├── components/              # Shared React components
 │   │   ├── AppLayout.tsx        # Main application layout (sidebar, header)
 │   │   └── ThemeToggle.tsx      # Dark/light theme toggle button
 │   ├── context/                 # React Context providers
 │   │   └── ThemeContext.tsx     # Theme state management
-│   ├── help/                    # Help/documentation page
-│   ├── items/                   # Items management page
-│   ├── jobs/                    # Jobs listing page
-│   ├── settings/                # Settings page
-│   ├── templates/               # Templates library page
-│   ├── upload/                  # File upload page
-│   ├── globals.css              # Global styles and CSS variables
-│   ├── layout.tsx               # Root layout (metadata, providers)
-│   └── page.tsx                 # Dashboard home page
+│   └── i18n/                    # Internationalization configuration
+│       └── config.ts            # i18n setup and translations
 ├── public/                      # Static assets
 ├── node_modules/                # Dependencies (gitignored)
 ├── .eslintrc.json              # ESLint configuration
@@ -116,16 +121,18 @@ client-app/
 
 ### Key Directories Explained
 
-- **`app/`** - Contains all routes and pages using Next.js App Router
-- **`app/components/`** - Reusable React components used across pages
-- **`app/context/`** - Global state management using React Context
+- **`src/`** - Main source code directory containing all application code
+- **`src/app/`** - Contains all routes and pages using Next.js App Router
+- **`src/components/`** - Reusable React components used across pages
+- **`src/context/`** - Global state management using React Context
+- **`src/i18n/`** - Internationalization configuration and translation files
 - **`public/`** - Static files served at the root URL
 
 ## Development
 
 ### Creating a New Page
 
-1. Create a new folder in `app/` with the route name
+1. Create a new folder in `src/app/` with the route name
 2. Add a `page.tsx` file inside:
    ```tsx
    'use client';
@@ -143,15 +150,15 @@ client-app/
 
 ### Adding to Navigation
 
-Update `app/components/AppLayout.tsx`:
+Update `src/components/AppLayout.tsx`:
 1. Add route mapping in `routeToKeyMap` and `keyToRouteMap`
 2. Add menu item to `menuItems` array
 3. Add page title to `getPageTitle` function
 
 ### Theme Customization
 
-- **Global CSS variables**: Edit `app/globals.css`
-- **Ant Design theme**: Modify `app/context/ThemeContext.tsx`
+- **Global CSS variables**: Edit `src/app/globals.css`
+- **Ant Design theme**: Modify `src/context/ThemeContext.tsx`
 - **Component styles**: Use Ant Design's inline styles or Tailwind classes
 
 ## Building for Production
