@@ -44,6 +44,12 @@
     "deleteConfirmDescription": "¿Está seguro que desea eliminar este usuario?",
     "deleteConfirmOk": "Sí",
     "deleteConfirmCancel": "No",
+    "inactivateSuccess": "Usuario inactivado exitosamente",
+    "inactivateError": "Error al inactivar usuario",
+    "inactivateConfirmTitle": "Inactivar Usuario",
+    "inactivateConfirmDescription": "¿Está seguro que desea inactivar este usuario?",
+    "inactivateConfirmOk": "Sí",
+    "inactivateConfirmCancel": "No",
     "table": {
       "id": "ID",
       "name": "Nombre",

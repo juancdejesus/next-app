@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/AppLayout';
@@ -137,6 +137,25 @@ export default function UsersPage() {
     }
   };
 
+  const handleInactivate = async (id: number) => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}/users/${id}/inactivate`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to inactivate user');
+      }
+
+      message.success(t('users.inactivateSuccess'));
+      fetchUsers();
+    } catch (error) {
+      console.error('Error inactivating user:', error);
+      message.error(t('users.inactivateError'));
+    }
+  };
+
   const columns: ColumnsType<User> = [
     {
       title: t('users.table.id'),
@@ -178,7 +197,7 @@ export default function UsersPage() {
     {
       title: t('users.table.actions'),
       key: 'actions',
-      width: 150,
+      width: 200,
       render: (_: any, record: User) => (
         <div style={{ display: 'flex', gap: 8 }} onClick={(e) => e.stopPropagation()}>
           <Button
@@ -188,6 +207,21 @@ export default function UsersPage() {
           >
             {/* {t('users.table.edit')} */}
           </Button>
+          <Popconfirm
+            title={t('users.inactivateConfirmTitle')}
+            description={t('users.inactivateConfirmDescription')}
+            onConfirm={() => handleInactivate(record.id)}
+            okText={t('users.inactivateConfirmOk')}
+            cancelText={t('users.inactivateConfirmCancel')}
+          >
+            <Button
+              type="text"
+              icon={<StopOutlined />}
+              style={{ color: '#faad14' }}
+            >
+              {/* {t('users.table.inactivate')} */}
+            </Button>
+          </Popconfirm>
           <Popconfirm
             title={t('users.deleteConfirmTitle')}
             description={t('users.deleteConfirmDescription')}

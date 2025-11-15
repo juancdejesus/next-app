@@ -143,6 +143,23 @@ namespace App.Server.Endpoints
                     ? Results.NotFound(new { Message = $"User with ID {id} not found." })
                     : Results.Ok(new { Message = $"User with ID {id} deleted successfully." });
             });
+
+            app.MapPost($"{BaseRoute}/{{id:int}}/inactivate", async (int id, DapperContext context) =>
+            {
+                using var connection = context.CreateConnection();
+
+                var parameters = new { p_id = id };
+
+                var rowsAffected = await connection.ExecuteAsync(
+                    "proc_inactivate_user",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return rowsAffected == 0
+                    ? Results.NotFound(new { Message = $"User with ID {id} not found." })
+                    : Results.Ok(new { Message = $"User with ID {id} has been inactivated." });
+            });
         }
     }
 

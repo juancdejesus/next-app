@@ -30,12 +30,14 @@ ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE user;
+
 -- Insert initial users (only if they don't exist)
 INSERT IGNORE INTO user (name, username, email, password_hash, user_status, open_date, close_date) VALUES 
 ('Admin', 'admin', 'admin@example.com', '$2a$04$yydSfPlMRY1y5y6oMGcpIOyCFBs4TmjnoW7zrC4f2RcPpE2PJeEZS', 'A', '2025-01-01', null),
 ('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', null),
 ('Monitor User', 'monitor', 'monitor@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', null),
-('Test User', 'test', 'test@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-07-01', null);
+('Pedro Martinez', 'pedro', 'pedro@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-07-01', null);
 
 -- --------------------------------------------------------------
 -- Procedure: proc_get_user_list
@@ -96,8 +98,19 @@ DROP PROCEDURE IF EXISTS proc_delete_user;
 
 CREATE PROCEDURE proc_delete_user(IN p_id BIGINT)
 BEGIN
+    DELETE FROM user WHERE id = p_id;
+END;
+
+-- --------------------------------------------------------------
+-- Procedure: proc_inactivate_user
+-- --------------------------------------------------------------
+DROP PROCEDURE IF EXISTS proc_inactivate_user;
+
+CREATE PROCEDURE proc_inactivate_user(IN p_id BIGINT)
+BEGIN
     UPDATE user SET user_status = 'I', close_date = CURDATE() WHERE id = p_id;
 END;
+
 
 -- --------------------------------------------------------------
 -- Procedure: proc_update_user
