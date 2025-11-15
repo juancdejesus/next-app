@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm } from 'antd';
+import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm, Tooltip } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
@@ -197,16 +197,18 @@ export default function UsersPage() {
     {
       title: t('users.table.actions'),
       key: 'actions',
-      width: 200,
+      width: 150,
       render: (_: unknown, record: User) => (
-        <div style={{ display: 'flex', gap: 8 }} onClick={(e) => e.stopPropagation()}>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => showEditModal(record)}
-          >
-            {/* {t('users.table.edit')} */}
-          </Button>
+        <div style={{ display: 'flex', gap: 0 }} onClick={(e) => e.stopPropagation()}>
+          <Tooltip title={t('users.table.edit')}>
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => showEditModal(record)}
+            >
+              {/* {t('users.table.edit')} */}
+            </Button>
+          </Tooltip>
           <Popconfirm
             title={t('users.inactivateConfirmTitle')}
             description={t('users.inactivateConfirmDescription')}
@@ -214,13 +216,15 @@ export default function UsersPage() {
             okText={t('users.inactivateConfirmOk')}
             cancelText={t('users.inactivateConfirmCancel')}
           >
-            <Button
-              type="text"
-              icon={<StopOutlined />}
-              style={{ color: '#faad14' }}
-            >
-              {/* {t('users.table.inactivate')} */}
-            </Button>
+            <Tooltip title={t('users.table.inactivate')}>
+              <Button
+                type="text"
+                icon={<StopOutlined />}
+                style={{ color: '#faad14' }}
+              >
+                {/* {t('users.table.inactivate')} */}
+              </Button>
+            </Tooltip>
           </Popconfirm>
           <Popconfirm
             title={t('users.deleteConfirmTitle')}
@@ -229,13 +233,15 @@ export default function UsersPage() {
             okText={t('users.deleteConfirmOk')}
             cancelText={t('users.deleteConfirmCancel')}
           >
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-            >
-              {/* {t('users.table.delete')} */}
-            </Button>
+            <Tooltip title={t('users.table.delete')}>
+              <Button
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+              >
+                {/* {t('users.table.delete')} */}
+              </Button>
+            </Tooltip>
           </Popconfirm>
         </div>
       ),

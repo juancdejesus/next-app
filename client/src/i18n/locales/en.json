@@ -62,6 +62,7 @@
       "actions": "Actions",
       "edit": "Edit",
       "delete": "Delete",
+      "inactivate": "Inactivate",
       "total": "Total {{count}} users"
     },
     "modal": {
