@@ -15,6 +15,7 @@ import {
   DatabaseOutlined,
   AppstoreOutlined,
   GlobalOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +36,8 @@ const routeToKeyMap: Record<string, string> = {
   '/approvals': '4',
   '/templates': '5',
   '/items': '6',
-  '/settings': '7',
+  '/users': '7',
+  '/settings': '8',
   '/help': 'help',
 };
 
@@ -47,7 +49,8 @@ const keyToRouteMap: Record<string, string> = {
   '4': '/approvals',
   '5': '/templates',
   '6': '/items',
-  '7': '/settings',
+  '7': '/users',
+  '8': '/settings',
   'help': '/help',
 };
 
@@ -69,6 +72,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       '/approvals': 'menu.approvals',
       '/templates': 'menu.templates',
       '/items': 'menu.items',
+      '/users': 'menu.users',
       '/settings': 'menu.settings',
       '/help': 'menu.help',
     };
@@ -125,9 +129,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
     },
     {
       key: '7',
+      icon: <UserOutlined />,
+      label: t('menu.users'),
+      onClick: () => handleMenuClick('7'),
+    },
+    {
+      key: '8',
       icon: <SettingOutlined />,
       label: t('menu.settings'),
-      onClick: () => handleMenuClick('7'),
+      onClick: () => handleMenuClick('8'),
     },
   ];
 
@@ -185,6 +195,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           left: 0,
           top: 0,
           bottom: 0,
+          userSelect: 'none',
         }}
       >
         <div
@@ -246,6 +257,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 onClick: () => handleMenuClick('help'),
               },
             ]}
+            style={{ userSelect: 'none' }}
           />
         </div>
       </Sider>
