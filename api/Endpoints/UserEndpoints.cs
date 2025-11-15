@@ -22,7 +22,47 @@ namespace App.Server.Endpoints
 
         public void MapEndpoints(IEndpointRouteBuilder app)
         {
- 
+            // Get current Windows authenticated user from browser
+            app.MapGet($"{BaseRoute}/me", (HttpContext httpContext) =>
+            {
+                var user = httpContext.User;
+                var identity = user?.Identity;
+
+                // Check if user is authenticated via Windows Authentication
+                if (identity?.IsAuthenticated == true && !string.IsNullOrEmpty(identity.Name))
+                {
+                    var username = identity.Name;
+
+                    // Parse domain\username format
+                    var parts = username.Split('\\');
+                    var domain = parts.Length > 1 ? parts[0] : string.Empty;
+                    var userName = parts.Length > 1 ? parts[1] : parts[0];
+
+                    return Results.Ok(new
+                    {
+                        username = userName,
+                        domain = domain,
+                        fullName = username,
+                        isAuthenticated = true,
+                        authenticationType = identity.AuthenticationType
+                    });
+                }
+
+                // Fallback: Return server process user if no Windows Authentication
+                var windowsUsername = Environment.UserName;
+                var domainUsername = Environment.UserDomainName;
+
+                return Results.Ok(new
+                {
+                    username = windowsUsername,
+                    domain = domainUsername,
+                    fullName = $"{domainUsername}\\{windowsUsername}",
+                    isAuthenticated = false,
+                    authenticationType = "ServerProcess",
+                    note = "Windows Authentication not detected. Run with IIS Express and ensure windowsAuthentication=true in launchSettings.json"
+                });
+            });
+
             // Get user list
             app.MapGet(BaseRoute, async (DapperContext context, string? search) =>
             {

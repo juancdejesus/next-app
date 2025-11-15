@@ -1,6 +1,7 @@
 using App.Server.Utils;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -44,6 +45,16 @@ namespace App.Server
             // Add DapperContext
             builder.Services.AddSingleton<DapperContext>();
 
+            // Configure Windows Authentication for IIS/IIS Express
+            builder.Services.AddAuthentication(Microsoft.AspNetCore.Server.IISIntegration.IISDefaults.AuthenticationScheme);
+
+            // Configure IIS integration to forward Windows credentials
+            builder.Services.Configure<Microsoft.AspNetCore.Builder.IISOptions>(options =>
+            {
+                options.AutomaticAuthentication = true;
+                options.ForwardClientCertificate = true;
+            });
+
             var app = builder.Build();
             
             // Configure the application's base path
@@ -70,6 +81,9 @@ namespace App.Server
 
             // Apply the CORS policy
             app.UseCors(AllowFrontendOrigin);
+
+            // Enable Windows Authentication
+            app.UseAuthentication();
 
             // Map API endpoints and client-side fallback
             app.MapGroup("/api").MapEndpoints(Assembly.GetExecutingAssembly());
