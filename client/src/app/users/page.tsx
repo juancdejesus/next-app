@@ -8,15 +8,15 @@ import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/AppLayout';
 import dayjs from 'dayjs';
 
-
 interface User {
   id: number;
   name: string;
   username: string;
   email: string;
+  password: string;
   user_status: string;
-  open_date: string;
-  close_date: string | null;
+  open_date: Date;
+  close_date: Date | null;
 }
 
 export default function UsersPage() {
@@ -77,7 +77,7 @@ export default function UsersPage() {
     form.resetFields();
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: User) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const payload = {
