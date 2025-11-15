@@ -4,7 +4,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Data Update Portal",
+  title: "Update Hub",
   description: "Enterprise SaaS Data Management Platform",
 };
 

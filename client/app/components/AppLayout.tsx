@@ -1,4 +1,6 @@
 'use client';
+import '@ant-design/v5-patch-for-react-19';
+
 
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -187,7 +189,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
         theme="dark"
-        width={256}
+        width={200}
         style={{
           overflow: 'auto',
           height: '100vh',
@@ -270,6 +272,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '1px solid #f0f0f0',
+            
           }}
         >
           <Breadcrumb
@@ -281,8 +284,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 title: t(getPageTitleKey(pathname)),
               },
             ]}
+            style={{cursor: 'pointer', userSelect: 'none' }}
           />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, userSelect: 'none', }}>
             <ThemeToggle />
             <Badge count={5}>
               <BellOutlined style={{ fontSize: 20, cursor: 'pointer' }} />
