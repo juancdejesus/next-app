@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from 'antd';
-import AppLayout from '../components/AppLayout';
+import AppLayout from '@/components/AppLayout';
 
 export default function HelpPage() {
   return (

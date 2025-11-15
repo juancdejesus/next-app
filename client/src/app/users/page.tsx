@@ -5,7 +5,7 @@ import { Table, Card, message, Spin, Button, Modal, Form, Input, Select, DatePic
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
-import AppLayout from '../components/AppLayout';
+import AppLayout from '@/components/AppLayout';
 import dayjs from 'dayjs';
 
 interface User {

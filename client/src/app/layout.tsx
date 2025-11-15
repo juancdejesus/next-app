@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeProvider } from "../context/ThemeContext";
 import "./globals.css";
 
 export const metadata: Metadata = {

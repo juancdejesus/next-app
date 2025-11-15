@@ -130,7 +130,7 @@ client-app/
    ```tsx
    'use client';
 
-   import AppLayout from '../components/AppLayout';
+   import AppLayout from '@/components/AppLayout';
 
    export default function MyNewPage() {
      return (

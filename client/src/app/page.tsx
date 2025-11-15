@@ -3,7 +3,7 @@
 import { Card, Col, Row, Statistic, Table, Button, Tag, Space } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, EyeOutlined, DownloadOutlined, CloudUploadOutlined, FileTextOutlined, CheckSquareOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import AppLayout from './components/AppLayout';
+import AppLayout from '@/components/AppLayout';
 
 interface JobRecord {
   key: string;

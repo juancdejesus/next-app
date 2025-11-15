@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Table, Spin, Alert, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import AppLayout from '../components/AppLayout';
+import AppLayout from '@/components/AppLayout';
 
 interface ItemData {
   id: string;
