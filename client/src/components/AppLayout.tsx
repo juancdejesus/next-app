@@ -1,10 +1,10 @@
 'use client';
 import '@ant-design/v5-patch-for-react-19';
 
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Layout, Menu, Avatar, Dropdown, Badge, Breadcrumb, theme } from 'antd';
+import { LayoutPanelLeft } from 'lucide-react';
 import {
   DashboardOutlined,
   CloudUploadOutlined,
@@ -14,7 +14,6 @@ import {
   SettingOutlined,
   QuestionCircleOutlined,
   BellOutlined,
-  DatabaseOutlined,
   AppstoreOutlined,
   GlobalOutlined,
   UserOutlined,
@@ -57,13 +56,26 @@ const keyToRouteMap: Record<string, string> = {
 };
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  // Initialize collapsed state from localStorage
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedCollapsed = localStorage.getItem('siderCollapsed');
+      return savedCollapsed === 'true';
+    }
+    return false;
+  });
   const pathname = usePathname();
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  // Save collapsed state to localStorage whenever it changes
+  const handleCollapse = (value: boolean) => {
+    setCollapsed(value);
+    localStorage.setItem('siderCollapsed', String(value));
+  };
 
   // Map pathname to translation key
   const getPageTitleKey = (path: string): string => {
@@ -187,7 +199,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <Sider
         collapsible
         collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
+        onCollapse={handleCollapse}
         theme="dark"
         width={200}
         style={{
@@ -201,12 +213,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
         }}
       >
         <div
+          onClick={() => collapsed && handleCollapse(false)}
           style={{
             height: 64,
             margin: 16,
             display: 'flex',
             alignItems: 'center',
             gap: 12,
+            cursor: collapsed ? 'pointer' : 'default',
           }}
         >
           <div
@@ -219,9 +233,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
+              marginLeft: 10
             }}
           >
-            <DatabaseOutlined style={{ color: 'white', fontSize: 18 }} />
+            {/* <DatabaseOutlined style={{ color: 'white', fontSize: 18 }} /> */}
+            <LayoutPanelLeft style={{ color: 'white', fontSize: 18 }} />
           </div>
           <h1
             style={{

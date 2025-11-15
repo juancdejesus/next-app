@@ -198,7 +198,7 @@ export default function UsersPage() {
       title: t('users.table.actions'),
       key: 'actions',
       width: 200,
-      render: (_: any, record: User) => (
+      render: (_: unknown, record: User) => (
         <div style={{ display: 'flex', gap: 8 }} onClick={(e) => e.stopPropagation()}>
           <Button
             type="text"
