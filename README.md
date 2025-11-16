@@ -189,6 +189,42 @@ curl -X POST https://localhost:<port>/monitor/api/users \
 | `npm run start` | Start production server (requires build first) |
 | `npm run lint` | Run ESLint to check code quality |
 
+### Best Practices
+
+#### Using Ant Design Message API
+
+When using the Ant Design message API in your components, always use `App.useApp()` instead of importing `message` directly from `antd`. This ensures proper integration with the App component context.
+
+**Correct usage:**
+```typescript
+import { App } from 'antd';
+
+export default function MyComponent() {
+  const { message } = App.useApp();
+
+  const handleAction = () => {
+    message.success('Action completed successfully');
+  };
+
+  return <button onClick={handleAction}>Click me</button>;
+}
+```
+
+**Incorrect usage:**
+```typescript
+import { message } from 'antd'; // ❌ Don't do this
+
+export default function MyComponent() {
+  const handleAction = () => {
+    message.success('Action completed successfully');
+  };
+
+  return <button onClick={handleAction}>Click me</button>;
+}
+```
+
+This applies to other static methods like `modal`, `notification`, etc. Always use the hook version provided by `App.useApp()`.
+
 ## CORS Configuration
 
 The API is configured to allow requests from `http://localhost:3000` by default. Update the CORS policy in [api/Program.cs](api/Program.cs) to match your frontend URL for different environments.

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Select, Radio, Space, message } from 'antd';
+import { Card, Select, Radio, Space, App } from 'antd';
 import AppLayout from '@/components/AppLayout';
 import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ const BASE_COLORS = [
 export default function SettingsPage() {
   const { language, setLanguage, dateFormat, setDateFormat, siderColor, setSiderColor } = useTheme();
   const { t, i18n } = useTranslation();
+  const { message } = App.useApp();
 
   const handleLanguageChange = (value: 'en' | 'es') => {
     setLanguage(value);
