@@ -21,6 +21,7 @@ import {
 import type { MenuProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import ThemeToggle from './ThemeToggle';
+import { useTheme } from '@/context/ThemeContext';
 import '../i18n/config';
 
 const { Header, Sider, Content } = Layout;
@@ -67,6 +68,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  const { siderColor } = useTheme();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -210,6 +212,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           top: 0,
           bottom: 0,
           userSelect: 'none',
+          backgroundColor: siderColor,
         }}
       >
         <div
@@ -261,6 +264,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           selectedKeys={[selectedKey]}
           mode="inline"
           items={menuItems}
+          style={{ backgroundColor: siderColor }}
         />
         <div style={{ position: 'absolute', bottom: 50, width: '100%', padding: '0 16px' }}>
           <Menu
@@ -275,7 +279,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 onClick: () => handleMenuClick('help'),
               },
             ]}
-            style={{ userSelect: 'none' }}
+            style={{ userSelect: 'none', backgroundColor: siderColor }}
           />
         </div>
       </Sider>

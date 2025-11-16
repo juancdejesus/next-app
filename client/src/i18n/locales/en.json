@@ -30,6 +30,27 @@
     "name": "John Smith",
     "role": "Global Submitter"
   },
+  "settings": {
+    "title": "Settings",
+    "languageChanged": "Language changed successfully",
+    "dateFormatChanged": "Date format changed successfully",
+    "siderColorChanged": "Sidebar color changed successfully",
+    "language": {
+      "title": "Language Settings",
+      "label": "Select Language",
+      "description": "Choose your preferred language for the interface"
+    },
+    "dateFormat": {
+      "title": "Date Format Settings",
+      "label": "Select Date Format",
+      "description": "Choose how dates should be displayed throughout the application"
+    },
+    "siderColor": {
+      "title": "Sidebar Color Settings",
+      "label": "Select Sidebar Color",
+      "description": "Choose a color theme for the sidebar navigation"
+    }
+  },
   "users": {
     "title": "Users",
     "addUser": "Add User",

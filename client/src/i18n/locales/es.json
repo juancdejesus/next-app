@@ -30,6 +30,27 @@
     "name": "John Smith",
     "role": "Remitente Global"
   },
+  "settings": {
+    "title": "Configuración",
+    "languageChanged": "Idioma cambiado exitosamente",
+    "dateFormatChanged": "Formato de fecha cambiado exitosamente",
+    "siderColorChanged": "Color de la barra lateral cambiado exitosamente",
+    "language": {
+      "title": "Configuración de Idioma",
+      "label": "Seleccionar Idioma",
+      "description": "Elija su idioma preferido para la interfaz"
+    },
+    "dateFormat": {
+      "title": "Configuración de Formato de Fecha",
+      "label": "Seleccionar Formato de Fecha",
+      "description": "Elija cómo se deben mostrar las fechas en toda la aplicación"
+    },
+    "siderColor": {
+      "title": "Configuración de Color de Barra Lateral",
+      "label": "Seleccionar Color de Barra Lateral",
+      "description": "Elija un tema de color para la barra de navegación lateral"
+    }
+  },
   "users": {
     "title": "Usuarios",
     "addUser": "Agregar Usuario",
