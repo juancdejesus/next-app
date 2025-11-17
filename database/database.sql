@@ -124,3 +124,64 @@ BEGIN
     UPDATE user SET name = p_name, username = p_username, email = p_email, user_status = p_user_status
     WHERE id = p_id;
 END;
+
+-- ==============================================================
+-- Table: user_settings
+-- ==============================================================
+CREATE TABLE IF NOT EXISTS user_settings (
+    id BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    language VARCHAR(10) DEFAULT 'en',
+    date_format VARCHAR(20) DEFAULT 'yyyy-mm-dd',
+    sider_color VARCHAR(20) DEFAULT '#001529',
+    theme VARCHAR(10) DEFAULT 'light',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_settings (user_id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------------
+-- Procedure: proc_get_user_settings
+-- --------------------------------------------------------------
+DROP PROCEDURE IF EXISTS proc_get_user_settings;
+
+CREATE PROCEDURE proc_get_user_settings(IN p_user_id BIGINT)
+BEGIN
+    SELECT
+        us.id, us.user_id, us.language, us.date_format, us.sider_color, us.theme, us.created_at, us.updated_at
+    FROM user_settings us
+    WHERE us.user_id = p_user_id;
+END;
+
+-- --------------------------------------------------------------
+-- Procedure: proc_upsert_user_settings
+-- --------------------------------------------------------------
+DROP PROCEDURE IF EXISTS proc_upsert_user_settings;
+
+CREATE PROCEDURE proc_upsert_user_settings(
+    IN p_user_id BIGINT,
+    IN p_language VARCHAR(10),
+    IN p_date_format VARCHAR(20),
+    IN p_sider_color VARCHAR(20),
+    IN p_theme VARCHAR(10)
+)
+BEGIN
+    INSERT INTO user_settings (user_id, language, date_format, sider_color, theme)
+    VALUES (p_user_id, p_language, p_date_format, p_sider_color, p_theme)
+    ON DUPLICATE KEY UPDATE
+        language = p_language,
+        date_format = p_date_format,
+        sider_color = p_sider_color,
+        theme = p_theme,
+        updated_at = CURRENT_TIMESTAMP;
+
+    -- Return the updated/inserted settings
+    SELECT
+        us.id, us.user_id, us.language, us.date_format, us.sider_color, us.theme, us.created_at, us.updated_at
+    FROM user_settings us
+    WHERE us.user_id = p_user_id;
+END;
