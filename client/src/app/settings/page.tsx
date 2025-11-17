@@ -15,6 +15,11 @@ const BASE_COLORS = [
   { name: 'Crimson', value: '#991b1b' },
   { name: 'Slate', value: '#334155' },
   { name: 'Indigo', value: '#312e81' },
+  { name: 'Olive', value: '#3f6212' },
+  { name: 'Maroon', value: '#7f1d1d' },
+  { name: 'Charcoal', value: '#2d2d2d' },
+  { name: 'Midnight Blue', value: '#121063' }
+  
 ];
 
 export default function SettingsPage() {
@@ -43,9 +48,9 @@ export default function SettingsPage() {
       <div>
         <h1 style={{ fontSize: 30, fontWeight: 'bold', marginBottom: 24 }}>{t('settings.title')}</h1>
 
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }} >
           {/* Language and Date Format Settings Row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, maxWidth: 800 }}>
             {/* Language Settings */}
             <Card title={t('settings.language.title')}>
               <div style={{ marginBottom: 8 }}>
@@ -88,12 +93,12 @@ export default function SettingsPage() {
           </div>
 
           {/* Sider Color Settings */}
-          <Card title={t('settings.siderColor.title')}>
+          <Card title={t('settings.siderColor.title')} style={{ maxWidth: 800 }}>
             <div style={{ marginBottom: 8 }}>
               <label style={{ fontWeight: 500, marginBottom: 8, display: 'block' }}>
                 {t('settings.siderColor.label')}
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 12, marginTop: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12, marginTop: 12 }}>
                 {BASE_COLORS.map((color) => (
                   <div
                     key={color.value}
