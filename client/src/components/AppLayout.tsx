@@ -70,7 +70,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { t, i18n } = useTranslation();
   const { siderColor } = useTheme();
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer, colorBgLayout, borderRadiusLG },
   } = theme.useToken();
 
   // Save collapsed state to localStorage whenever it changes
@@ -325,10 +325,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </Header>
         <Content
           style={{
-            margin: 24,
+            margin: 0,
             padding: 24,
             minHeight: 280,
-            background: colorBgContainer,
+            background: colorBgLayout,
             borderRadius: borderRadiusLG,
           }}
         >

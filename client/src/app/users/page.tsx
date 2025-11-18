@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm, Tooltip, Avatar } from 'antd';
+import { App, Table, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm, Tooltip, Avatar, theme } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined, UserOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
@@ -55,7 +55,10 @@ export default function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
-  const { message } = App.useApp(); 
+  const { message } = App.useApp();
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken(); 
   
   useEffect(() => {
     fetchUsers();
@@ -73,7 +76,19 @@ export default function UsersPage() {
 
       const data = await response.json();
       setUsers(data);
-      setFilteredUsers(data);
+
+      // Apply existing search filter if present
+      if (searchText) {
+        const filtered = data.filter(
+          (user: User) =>
+            user.Name?.toLowerCase().includes(searchText.toLowerCase()) ||
+            user.Email?.toLowerCase().includes(searchText.toLowerCase()) ||
+            user.Username?.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setFilteredUsers(filtered);
+      } else {
+        setFilteredUsers(data);
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
       message.error(t('users.fetchError'));
@@ -303,17 +318,25 @@ export default function UsersPage() {
     <AppLayout>
       <div>
         {/* Page Header */}
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0, marginBottom: 8 }}>
+        
+        {/* <div style={{ marginBottom: 10 }}>
+          <h1 style={{ fontSize: 30, fontWeight: 600, margin: 0, marginBottom: 8 }}>
             {t('users.title')}
           </h1>
           <p style={{ fontSize: 14, color: '#999', margin: 0 }}>
             {t('users.description')}
           </p>
-        </div>
+        </div> */}
 
         {/* Toolbar - Search and Add Button */}
-        <Card style={{ marginBottom: 24 }}>
+        <div style={{
+          marginBottom: 24,
+          padding: '24px',
+          border: '1px solid #d9d9d9',
+          borderRadius: '8px',
+          backgroundColor: colorBgContainer,
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)'
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
             <Input
               placeholder={t('users.searchPlaceholder')}
@@ -327,27 +350,32 @@ export default function UsersPage() {
               {t('users.addUser')}
             </Button>
           </div>
-        </Card>
+        </div>
 
         {/* Users Table */}
-        <Card>
-          <Spin spinning={loading}>
-            <Table
-              columns={columns}
-              dataSource={filteredUsers}
-              rowKey="Id"
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-                showTotal: (total) => t('users.table.total', { count: total }),
-              }}
-              onRow={(record) => ({
-                style: { cursor: 'pointer' },
-                onClick: () => showEditModal(record),
-              })}
-            />
-          </Spin>
-        </Card>
+        <Spin spinning={loading}>
+          <Table
+            columns={columns}
+            dataSource={filteredUsers}
+            rowKey="Id"
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total) => t('users.table.total', { count: total }),
+            }}
+            onRow={(record) => ({
+              style: { cursor: 'pointer' },
+              onClick: () => showEditModal(record),
+            })}
+            className="users-table"
+            style={{
+              border: '1px solid #d9d9d9',
+              borderRadius: '8px',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+              overflow: 'hidden'
+            }}
+          />
+        </Spin>
 
         <Modal
           title={t(editingUser ? 'users.modal.editTitle' : 'users.modal.title')}
