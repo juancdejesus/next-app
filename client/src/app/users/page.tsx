@@ -1,12 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm, Tooltip } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined } from '@ant-design/icons';
+import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm, Tooltip, Avatar } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined, UserOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/AppLayout';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
+
+// Helper function to generate avatar color based on name
+const getAvatarColor = (name: string): string => {
+  const colors = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae', '#1890ff', '#52c41a'];
+  const index = name.charCodeAt(0) % colors.length;
+  return colors[index];
+};
+
+// Helper function to format last active time
+const formatLastActive = (lastActiveTime: Date | null): string => {
+  if (!lastActiveTime) return 'Never';
+  return dayjs(lastActiveTime).fromNow();
+};
 
 interface User {
   Id: number;
@@ -17,6 +33,7 @@ interface User {
   UserStatus: string;
   OpenDate: Date;
   CloseDate: Date | null;
+  LastActiveTime: Date | null;
 }
 
 interface UserFormValues {
@@ -168,15 +185,24 @@ export default function UsersPage() {
 
   const columns: ColumnsType<User> = [
     {
-      title: t('users.table.id'),
-      dataIndex: 'Id',
-      key: 'Id',
-      width: 80,
-    },
-    {
-      title: t('users.table.name'),
+      title: t('users.table.user'),
       dataIndex: 'Name',
       key: 'Name',
+      render: (_: unknown, record: User) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Avatar
+            size={40}
+            style={{ backgroundColor: getAvatarColor(record.Name || 'U'), flexShrink: 0 }}
+            icon={<UserOutlined />}
+          >
+            {record.Name?.charAt(0).toUpperCase()}
+          </Avatar>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontWeight: 500, fontSize: '14px' }}>{record.Name}</span>
+            <span style={{ fontSize: '14px', color: '#999' }}>{record.Email}</span>
+          </div>
+        </div>
+      ),
     },
     {
       title: t('users.table.username'),
@@ -184,9 +210,16 @@ export default function UsersPage() {
       key: 'Username',
     },
     {
-      title: t('users.table.email'),
-      dataIndex: 'Email',
-      key: 'Email',
+      title: t('users.table.role'),
+      dataIndex: 'Role',
+      key: 'Role',
+      render: (role: string) => role || '-',
+    },
+    {
+      title: t('users.table.lastActive'),
+      dataIndex: 'LastActiveTime',
+      key: 'LastActiveTime',
+      render: (lastActiveTime: Date | null) => formatLastActive(lastActiveTime),
     },
     {
       title: t('users.table.status'),
@@ -197,12 +230,6 @@ export default function UsersPage() {
           {status === 'A' ? t('users.table.active') : t('users.table.inactive')}
         </Tag>
       ),
-    },
-    {
-      title: t('users.table.openDate'),
-      dataIndex: 'OpenDate',
-      key: 'OpenDate',
-      render: (date: string) => date ? new Date(date).toLocaleDateString() : '-',
     },
     {
       title: t('users.table.actions'),

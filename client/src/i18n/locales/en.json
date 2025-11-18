@@ -74,17 +74,21 @@
     "table": {
       "id": "ID",
       "name": "Name",
+      "user": "User",
       "username": "Username",
       "email": "Email",
       "status": "Status",
       "active": "Active",
       "inactive": "Inactive",
       "openDate": "Open Date",
+      "lastActive": "Last Active",
       "actions": "Actions",
       "edit": "Edit",
       "delete": "Delete",
       "inactivate": "Inactivate",
-      "total": "Total {{count}} users"
+      "total": "Total {{count}} users",
+      "login": "Login",
+      "role": "Role"
     },
     "modal": {
       "title": "Add New User",

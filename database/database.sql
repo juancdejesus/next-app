@@ -15,14 +15,22 @@ IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Us
 BEGIN
     CREATE TABLE [dbo].[User] (
         Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-        Name NVARCHAR(200) NULL, 
+        Name NVARCHAR(200) NULL,
         Username NVARCHAR(50) NOT NULL UNIQUE,
         Email NVARCHAR(100) NOT NULL UNIQUE,
         PasswordHash NVARCHAR(255) NOT NULL,
         UserStatus NVARCHAR(10) NULL,
         OpenDate DATE NULL,
-        CloseDate DATE NULL    
+        CloseDate DATE NULL,
+        LastActiveTime DATETIME2 NULL DEFAULT GETDATE()
     );
+END
+GO
+
+-- Add LastActiveTime column if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[User]') AND name = 'LastActiveTime')
+BEGIN
+    ALTER TABLE [dbo].[User] ADD LastActiveTime DATETIME2 NULL DEFAULT GETDATE();
 END
 GO
 
@@ -59,9 +67,9 @@ CREATE PROCEDURE [dbo].[User_GetList]
 AS
 BEGIN
     SET NOCOUNT ON;
-    
-    SELECT 
-        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate 
+
+    SELECT
+        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate, u.LastActiveTime
     FROM [User] u;
 END
 GO
@@ -78,9 +86,9 @@ CREATE PROCEDURE [dbo].[User_Get]
 AS
 BEGIN
     SET NOCOUNT ON;
-    
-    SELECT 
-        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate 
+
+    SELECT
+        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate, u.LastActiveTime
     FROM [User] u
     WHERE u.Id = @Id;
 END

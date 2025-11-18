@@ -74,17 +74,21 @@
     "table": {
       "id": "ID",
       "name": "Nombre",
+      "user": "Usuario",
       "username": "Usuario",
       "email": "Correo Electrónico",
       "status": "Estado",
       "active": "Activo",
       "inactive": "Inactivo",
       "openDate": "Fecha de Apertura",
+      "lastActive": "Última Actividad",
       "actions": "Acciones",
       "edit": "Editar",
       "delete": "Eliminar",
       "inactivate": "Desactivar",
-      "total": "Total {{count}} usuarios"
+      "total": "Total {{count}} usuarios",
+      "login": "Usuario",
+      "role": "Rol"
     },
     "modal": {
       "title": "Agregar Nuevo Usuario",
