@@ -53,6 +53,8 @@
   },
   "users": {
     "title": "Users",
+    "description": "Manage user roles, permissions, and access to templates.",
+    "searchPlaceholder": "Search users by name or email...",
     "addUser": "Add User",
     "fetchError": "Failed to fetch users",
     "createSuccess": "User created successfully",

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { App, Table, Card, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm, Tooltip, Avatar } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined, UserOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined, UserOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/AppLayout';
@@ -49,6 +49,8 @@ interface UserFormValues {
 export default function UsersPage() {
   const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -71,12 +73,24 @@ export default function UsersPage() {
 
       const data = await response.json();
       setUsers(data);
+      setFilteredUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
       message.error(t('users.fetchError'));
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+    const filtered = users.filter(
+      (user) =>
+        user.Name?.toLowerCase().includes(value.toLowerCase()) ||
+        user.Email?.toLowerCase().includes(value.toLowerCase()) ||
+        user.Username?.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredUsers(filtered);
   };
 
   const showModal = () => {
@@ -288,19 +302,39 @@ export default function UsersPage() {
   return (
     <AppLayout>
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0 }}>
+        {/* Page Header */}
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0, marginBottom: 8 }}>
             {t('users.title')}
           </h1>
-          <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
-            {t('users.addUser')}
-          </Button>
+          <p style={{ fontSize: 14, color: '#999', margin: 0 }}>
+            {t('users.description')}
+          </p>
         </div>
+
+        {/* Toolbar - Search and Add Button */}
+        <Card style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+            <Input
+              placeholder={t('users.searchPlaceholder')}
+              prefix={<SearchOutlined style={{ color: '#999' }} />}
+              value={searchText}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ maxWidth: 400, width: '100%' }}
+              allowClear
+            />
+            <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+              {t('users.addUser')}
+            </Button>
+          </div>
+        </Card>
+
+        {/* Users Table */}
         <Card>
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={users}
+              dataSource={filteredUsers}
               rowKey="Id"
               pagination={{
                 pageSize: 10,

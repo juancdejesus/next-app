@@ -53,6 +53,8 @@
   },
   "users": {
     "title": "Usuarios",
+    "description": "Administrar roles de usuario, permisos y acceso a plantillas.",
+    "searchPlaceholder": "Buscar usuarios por nombre o correo electrónico...",
     "addUser": "Agregar Usuario",
     "fetchError": "Error al cargar usuarios",
     "createSuccess": "Usuario creado exitosamente",
