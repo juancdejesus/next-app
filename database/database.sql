@@ -1,187 +1,272 @@
 -- Create the database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS datahub;
-
--- Create the user if it doesn't exist
-CREATE USER IF NOT EXISTS 'hub'@'%' IDENTIFIED BY 'hub';
-
--- Grant all privileges on datahub to user hub
-GRANT ALL PRIVILEGES ON datahub.* TO 'hub'@'%';
-
--- Apply the changes
-FLUSH PRIVILEGES;
-
--- Switch to datahub database
-USE datahub;
-
--- ==============================================================
--- Table: user
--- ==============================================================
-CREATE TABLE IF NOT EXISTS user (
-    id BIGINT auto_increment NOT NULL PRIMARY KEY,
-    name VARCHAR(200) NULL, 
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    user_status VARCHAR(10) NULL,
-    open_date DATE NULL,
-    close_date DATE NULL    
-)
-ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
-
-TRUNCATE TABLE user;
-
--- Insert initial users (only if they don't exist)
-INSERT IGNORE INTO user (name, username, email, password_hash, user_status, open_date, close_date) VALUES 
-('Admin', 'admin', 'admin@example.com', '$2a$04$yydSfPlMRY1y5y6oMGcpIOyCFBs4TmjnoW7zrC4f2RcPpE2PJeEZS', 'A', '2025-01-01', null),
-('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', null),
-('Monitor User', 'monitor', 'monitor@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', null),
-('Pedro Martinez', 'pedro', 'pedro@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-07-01', null);
-
--- --------------------------------------------------------------
--- Procedure: proc_get_user_list
--- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_get_user_list;
-
-CREATE PROCEDURE proc_get_user_list()
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'DataHub')
 BEGIN
+    CREATE DATABASE DataHub;
+END
+GO
+
+USE DataHub;
+GO
+
+-- ==============================================================
+-- Table: User
+-- ==============================================================
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[User] (
+        Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        Name NVARCHAR(200) NULL, 
+        Username NVARCHAR(50) NOT NULL UNIQUE,
+        Email NVARCHAR(100) NOT NULL UNIQUE,
+        PasswordHash NVARCHAR(255) NOT NULL,
+        UserStatus NVARCHAR(10) NULL,
+        OpenDate DATE NULL,
+        CloseDate DATE NULL    
+    );
+END
+GO
+
+-- Clear existing data
+TRUNCATE TABLE [User];
+GO
+
+-- Insert initial users
+IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'admin')
+    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
+    VALUES ('Admin', 'admin', 'admin@example.com', '$2a$04$yydSfPlMRY1y5y6oMGcpIOyCFBs4TmjnoW7zrC4f2RcPpE2PJeEZS', 'A', '2025-01-01', NULL);
+
+IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'juan')
+    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
+    VALUES ('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', NULL);
+
+IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'monitor')
+    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
+    VALUES ('Monitor User', 'monitor', 'monitor@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', NULL);
+
+IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'pedro')
+    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
+    VALUES ('Pedro Martinez', 'pedro', 'pedro@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-07-01', NULL);
+GO
+
+-- --------------------------------------------------------------
+-- Procedure: User_GetList
+-- --------------------------------------------------------------
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_GetList]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_GetList];
+GO
+
+CREATE PROCEDURE [dbo].[User_GetList]
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
     SELECT 
-        u.id, u.name, u.username, u.email, u.user_status, u.open_date, u.close_date 
-    FROM user u;
-END;
+        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate 
+    FROM [User] u;
+END
+GO
 
 -- --------------------------------------------------------------
--- Procedure: proc_get_user
+-- Procedure: User_Get
 -- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_get_user;
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Get]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Get];
+GO
 
-CREATE PROCEDURE proc_get_user(IN p_id BIGINT)
+CREATE PROCEDURE [dbo].[User_Get]
+    @Id BIGINT
+AS
 BEGIN
+    SET NOCOUNT ON;
+    
     SELECT 
-        u.id, u.name, u.username, u.email, u.user_status, u.open_date, u.close_date 
-    FROM user u
-    WHERE u.id = p_id;
-END;
+        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate 
+    FROM [User] u
+    WHERE u.Id = @Id;
+END
+GO
 
 -- --------------------------------------------------------------
--- Procedure: proc_get_user_by_username_or_email
+-- Procedure: User_GetByUsernameOrEmail
 -- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_get_user_by_username_or_email;
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_GetByUsernameOrEmail]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_GetByUsernameOrEmail];
+GO
 
-CREATE PROCEDURE proc_get_user_by_username_or_email(IN p_username_or_email VARCHAR(100))
+CREATE PROCEDURE [dbo].[User_GetByUsernameOrEmail]
+    @UsernameOrEmail NVARCHAR(100)
+AS
 BEGIN
+    SET NOCOUNT ON;
+    
     SELECT 
-        u.id, u.name, u.username, u.email, u.password_hash, u.user_status, u.open_date, u.close_date 
-    FROM user u
-    WHERE u.username = p_username_or_email OR u.email = p_username_or_email;
-END;
+        u.Id, u.Name, u.Username, u.Email, u.PasswordHash, u.UserStatus, u.OpenDate, u.CloseDate 
+    FROM [User] u
+    WHERE u.Username = @UsernameOrEmail OR u.Email = @UsernameOrEmail;
+END
+GO
 
 -- --------------------------------------------------------------
--- Procedure: proc_add_user
+-- Procedure: User_Add
 -- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_add_user;
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Add]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Add];
+GO
 
-CREATE PROCEDURE proc_add_user(
-    IN p_name VARCHAR(200), IN p_username VARCHAR(50), IN p_email VARCHAR(100), IN p_password_hash VARCHAR(255)
-)
+CREATE PROCEDURE [dbo].[User_Add]
+    @Name NVARCHAR(200),
+    @Username NVARCHAR(50),
+    @Email NVARCHAR(100),
+    @PasswordHash NVARCHAR(255)
+AS
 BEGIN
-    INSERT INTO user (name, username, email, password_hash, user_status, open_date) 
-    VALUES (p_name, p_username, p_email, p_password_hash, 'A', CURDATE());
-    SELECT LAST_INSERT_ID() as id;
-END; 
+    SET NOCOUNT ON;
+    
+    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate) 
+    VALUES (@Name, @Username, @Email, @PasswordHash, 'A', CAST(GETDATE() AS DATE));
+    
+    SELECT SCOPE_IDENTITY() AS Id;
+END
+GO
 
 -- --------------------------------------------------------------
--- Procedure: proc_delete_user
+-- Procedure: User_Delete
 -- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_delete_user;
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Delete]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Delete];
+GO
 
-CREATE PROCEDURE proc_delete_user(IN p_id BIGINT)
+CREATE PROCEDURE [dbo].[User_Delete]
+    @Id BIGINT
+AS
 BEGIN
-    DELETE FROM user WHERE id = p_id;
-END;
+    SET NOCOUNT ON;
+    
+    DELETE FROM [User] WHERE Id = @Id;
+END
+GO
 
 -- --------------------------------------------------------------
--- Procedure: proc_inactivate_user
+-- Procedure: User_Inactivate
 -- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_inactivate_user;
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Inactivate]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Inactivate];
+GO
 
-CREATE PROCEDURE proc_inactivate_user(IN p_id BIGINT)
+CREATE PROCEDURE [dbo].[User_Inactivate]
+    @Id BIGINT
+AS
 BEGIN
-    UPDATE user SET user_status = 'I', close_date = CURDATE() WHERE id = p_id;
-END;
-
+    SET NOCOUNT ON;
+    
+    UPDATE [User] 
+    SET UserStatus = 'I', CloseDate = CAST(GETDATE() AS DATE) 
+    WHERE Id = @Id;
+END
+GO
 
 -- --------------------------------------------------------------
--- Procedure: proc_update_user
+-- Procedure: User_Update
 -- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_update_user;
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Update]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Update];
+GO
 
-CREATE PROCEDURE proc_update_user(
-    IN p_id BIGINT, IN p_name VARCHAR(200), IN p_username VARCHAR(50), IN p_email VARCHAR(100), IN p_user_status VARCHAR(10)
-)
+CREATE PROCEDURE [dbo].[User_Update]
+    @Id BIGINT,
+    @Name NVARCHAR(200),
+    @Username NVARCHAR(50),
+    @Email NVARCHAR(100),
+    @UserStatus NVARCHAR(10)
+AS
 BEGIN
-    UPDATE user SET name = p_name, username = p_username, email = p_email, user_status = p_user_status
-    WHERE id = p_id;
-END;
+    SET NOCOUNT ON;
+    
+    UPDATE [User] 
+    SET Name = @Name, 
+        Username = @Username, 
+        Email = @Email, 
+        UserStatus = @UserStatus
+    WHERE Id = @Id;
+END
+GO
 
 -- ==============================================================
--- Table: user_settings
+-- Table: UserSettings
 -- ==============================================================
-CREATE TABLE IF NOT EXISTS user_settings (
-    id BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    language VARCHAR(10) DEFAULT 'en',
-    date_format VARCHAR(20) DEFAULT 'yyyy-mm-dd',
-    sider_color VARCHAR(20) DEFAULT '#001529',
-    theme VARCHAR(10) DEFAULT 'light',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_settings (user_id)
-)
-ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------------
--- Procedure: proc_get_user_settings
--- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_get_user_settings;
-
-CREATE PROCEDURE proc_get_user_settings(IN p_user_id BIGINT)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings]') AND type in (N'U'))
 BEGIN
+    CREATE TABLE [dbo].[UserSettings] (
+        Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        UserId BIGINT NOT NULL,
+        Language NVARCHAR(10) DEFAULT 'en',
+        DateFormat NVARCHAR(20) DEFAULT 'yyyy-mm-dd',
+        SiderColor NVARCHAR(20) DEFAULT '#001529',
+        Theme NVARCHAR(10) DEFAULT 'light',
+        CreatedAt DATETIME2 DEFAULT GETDATE(),
+        UpdatedAt DATETIME2 DEFAULT GETDATE(),
+        CONSTRAINT FK_UserSettings_User FOREIGN KEY (UserId) REFERENCES [User](Id) ON DELETE CASCADE,
+        CONSTRAINT UQ_UserSettings_UserId UNIQUE (UserId)
+    );
+END
+GO
+
+-- --------------------------------------------------------------
+-- Procedure: UserSettings_Get
+-- --------------------------------------------------------------
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings_Get]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[UserSettings_Get];
+GO
+
+CREATE PROCEDURE [dbo].[UserSettings_Get]
+    @UserId BIGINT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
     SELECT
-        us.id, us.user_id, us.language, us.date_format, us.sider_color, us.theme, us.created_at, us.updated_at
-    FROM user_settings us
-    WHERE us.user_id = p_user_id;
-END;
+        us.Id, us.UserId, us.Language, us.DateFormat, us.SiderColor, us.Theme, us.CreatedAt, us.UpdatedAt
+    FROM [UserSettings] us
+    WHERE us.UserId = @UserId;
+END
+GO
 
 -- --------------------------------------------------------------
--- Procedure: proc_upsert_user_settings
+-- Procedure: UserSettings_Upsert
 -- --------------------------------------------------------------
-DROP PROCEDURE IF EXISTS proc_upsert_user_settings;
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings_Upsert]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[UserSettings_Upsert];
+GO
 
-CREATE PROCEDURE proc_upsert_user_settings(
-    IN p_user_id BIGINT,
-    IN p_language VARCHAR(10),
-    IN p_date_format VARCHAR(20),
-    IN p_sider_color VARCHAR(20),
-    IN p_theme VARCHAR(10)
-)
+CREATE PROCEDURE [dbo].[UserSettings_Upsert]
+    @UserId BIGINT,
+    @Language NVARCHAR(10),
+    @DateFormat NVARCHAR(20),
+    @SiderColor NVARCHAR(20),
+    @Theme NVARCHAR(10)
+AS
 BEGIN
-    INSERT INTO user_settings (user_id, language, date_format, sider_color, theme)
-    VALUES (p_user_id, p_language, p_date_format, p_sider_color, p_theme)
-    ON DUPLICATE KEY UPDATE
-        language = p_language,
-        date_format = p_date_format,
-        sider_color = p_sider_color,
-        theme = p_theme,
-        updated_at = CURRENT_TIMESTAMP;
-
+    SET NOCOUNT ON;
+    
+    -- Use MERGE for upsert functionality
+    MERGE INTO [UserSettings] AS target
+    USING (SELECT @UserId AS UserId) AS source
+    ON target.UserId = source.UserId
+    WHEN MATCHED THEN
+        UPDATE SET
+            Language = @Language,
+            DateFormat = @DateFormat,
+            SiderColor = @SiderColor,
+            Theme = @Theme,
+            UpdatedAt = GETDATE()
+    WHEN NOT MATCHED THEN
+        INSERT (UserId, Language, DateFormat, SiderColor, Theme)
+        VALUES (@UserId, @Language, @DateFormat, @SiderColor, @Theme);
+    
     -- Return the updated/inserted settings
     SELECT
-        us.id, us.user_id, us.language, us.date_format, us.sider_color, us.theme, us.created_at, us.updated_at
-    FROM user_settings us
-    WHERE us.user_id = p_user_id;
-END;
+        us.Id, us.UserId, us.Language, us.DateFormat, us.SiderColor, us.Theme, us.CreatedAt, us.UpdatedAt
+    FROM [UserSettings] us
+    WHERE us.UserId = @UserId;
+END
+GO

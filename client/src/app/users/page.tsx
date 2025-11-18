@@ -9,7 +9,17 @@ import AppLayout from '@/components/AppLayout';
 import dayjs from 'dayjs';
 
 interface User {
-  id: number;
+  Id: number;
+  Name: string;
+  Username: string;
+  Email: string;
+  Password: string;
+  UserStatus: string;
+  OpenDate: Date;
+  CloseDate: Date | null;
+}
+
+interface UserFormValues {
   name: string;
   username: string;
   email: string;
@@ -62,12 +72,12 @@ export default function UsersPage() {
     setEditingUser(user);
     setIsModalOpen(true);
     form.setFieldsValue({
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      user_status: user.user_status,
-      open_date: user.open_date ? dayjs(user.open_date) : null,
-      close_date: user.close_date ? dayjs(user.close_date) : null,
+      name: user.Name,
+      username: user.Username,
+      email: user.Email,
+      user_status: user.UserStatus,
+      open_date: user.OpenDate ? dayjs(user.OpenDate) : null,
+      close_date: user.CloseDate ? dayjs(user.CloseDate) : null,
     });
   };
 
@@ -77,11 +87,11 @@ export default function UsersPage() {
     form.resetFields();
   };
 
-  const handleSubmit = async (values: User) => {
+  const handleSubmit = async (values: UserFormValues) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const payload = {
-        id: editingUser ? editingUser.id : 0,
+        id: editingUser ? editingUser.Id : 0,
         name: values.name,
         username: values.username,
         email: values.email,
@@ -91,7 +101,7 @@ export default function UsersPage() {
         close_date: values.close_date ? values.close_date.toISOString() : null,
       };
 
-      const url = editingUser ? `${apiUrl}/users/${editingUser.id}` : `${apiUrl}/users`;
+      const url = editingUser ? `${apiUrl}/users/${editingUser.Id}` : `${apiUrl}/users`;
       const method = editingUser ? 'PUT' : 'POST';
 
       console.log(apiUrl)
@@ -159,29 +169,29 @@ export default function UsersPage() {
   const columns: ColumnsType<User> = [
     {
       title: t('users.table.id'),
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'Id',
+      key: 'Id',
       width: 80,
     },
     {
       title: t('users.table.name'),
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'Name',
+      key: 'Name',
     },
     {
       title: t('users.table.username'),
-      dataIndex: 'username',
-      key: 'username',
+      dataIndex: 'Username',
+      key: 'Username',
     },
     {
       title: t('users.table.email'),
-      dataIndex: 'email',
-      key: 'email',
+      dataIndex: 'Email',
+      key: 'Email',
     },
     {
       title: t('users.table.status'),
-      dataIndex: 'user_status',
-      key: 'user_status',
+      dataIndex: 'UserStatus',
+      key: 'UserStatus',
       render: (status: string) => (
         <Tag color={status === 'A' ? 'green' : 'red'}>
           {status === 'A' ? t('users.table.active') : t('users.table.inactive')}
@@ -190,8 +200,8 @@ export default function UsersPage() {
     },
     {
       title: t('users.table.openDate'),
-      dataIndex: 'open_date',
-      key: 'open_date',
+      dataIndex: 'OpenDate',
+      key: 'OpenDate',
       render: (date: string) => date ? new Date(date).toLocaleDateString() : '-',
     },
     {
@@ -212,7 +222,7 @@ export default function UsersPage() {
           <Popconfirm
             title={t('users.inactivateConfirmTitle')}
             description={t('users.inactivateConfirmDescription')}
-            onConfirm={() => handleInactivate(record.id)}
+            onConfirm={() => handleInactivate(record.Id)}
             okText={t('users.inactivateConfirmOk')}
             cancelText={t('users.inactivateConfirmCancel')}
           >
@@ -229,7 +239,7 @@ export default function UsersPage() {
           <Popconfirm
             title={t('users.deleteConfirmTitle')}
             description={t('users.deleteConfirmDescription')}
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record.Id)}
             okText={t('users.deleteConfirmOk')}
             cancelText={t('users.deleteConfirmCancel')}
           >
@@ -264,7 +274,7 @@ export default function UsersPage() {
             <Table
               columns={columns}
               dataSource={users}
-              rowKey="id"
+              rowKey="Id"
               pagination={{
                 pageSize: 10,
                 showSizeChanger: true,

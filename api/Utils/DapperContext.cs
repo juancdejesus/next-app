@@ -1,4 +1,5 @@
-﻿using MySqlConnector;
+﻿using Microsoft.Data.SqlClient;
+using MySqlConnector;
 using System.Data;
 
 namespace App.Server.Utils
@@ -14,6 +15,7 @@ namespace App.Server.Utils
             _connectionString = _configuration.GetConnectionString("Default");
         }
 
-        public IDbConnection CreateConnection() => new MySqlConnection(_connectionString);
+        //public IDbConnection CreateConnection() => new MySqlConnection(_connectionString);
+        public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
     }
 }

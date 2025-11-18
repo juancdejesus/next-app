@@ -76,7 +76,7 @@ namespace App.Server.Endpoints
                 }
 
                 var users = await connection.QueryAsync<dynamic>(
-                    "proc_get_user_list",
+                    "User_GetList",
                     parameters,
                     commandType: CommandType.StoredProcedure);
 
@@ -87,10 +87,10 @@ namespace App.Server.Endpoints
             app.MapGet($"{BaseRoute}/{{id:int}}", async (int id, DapperContext context) =>
             {
                 using var connection = context.CreateConnection();
-                var parameters = new { p_id = id };
+                var parameters = new { Id = id };
 
                 var user = await connection.QueryFirstOrDefaultAsync<dynamic>(
-                    "proc_get_user",
+                    "User_Get",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -112,14 +112,14 @@ namespace App.Server.Endpoints
 
                 var parameters = new
                 {
-                    p_name = user.name,
-                    p_username = user.username,
-                    p_email = user.email,
-                    p_password_hash = user.password_hash
+                    Name = user.name,
+                    Username = user.username,
+                    Email = user.email,
+                    PasswordHash = user.password_hash
                 };
 
                 var newUser = await connection.QueryFirstOrDefaultAsync<dynamic>(
-                    "proc_add_user",
+                    "User_Add",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -138,15 +138,15 @@ namespace App.Server.Endpoints
 
                 var parameters = new
                 {
-                    p_id = id,
-                    p_name = user.name,
-                    p_username = user.username,
-                    p_email = user.email,
-                    p_user_status = user.user_status
+                    Id = id,
+                    Name = user.name,
+                    Username = user.username,
+                    Email = user.email,
+                    UserStatus = user.user_status
                 };
 
                 var rowsAffected = await connection.ExecuteAsync(
-                    "proc_update_user",
+                    "User_Update",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -158,8 +158,8 @@ namespace App.Server.Endpoints
 
                 // Fetch the updated user to return it
                 var updatedUser = await connection.QueryFirstOrDefaultAsync<dynamic>(
-                    "proc_get_user",
-                    new { p_id = id },
+                    "User_Get",
+                    new { Id = id },
                     commandType: CommandType.StoredProcedure
                 );
 
@@ -171,10 +171,10 @@ namespace App.Server.Endpoints
             {
                 using var connection = context.CreateConnection();
 
-                var parameters = new { p_id = id };
+                var parameters = new { Id = id };
 
                 var rowsAffected = await connection.ExecuteAsync(
-                    "proc_delete_user",
+                    "User_Delete",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -188,10 +188,10 @@ namespace App.Server.Endpoints
             {
                 using var connection = context.CreateConnection();
 
-                var parameters = new { p_id = id };
+                var parameters = new { Id = id };
 
                 var rowsAffected = await connection.ExecuteAsync(
-                    "proc_inactivate_user",
+                    "User_Inactivate",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -199,6 +199,23 @@ namespace App.Server.Endpoints
                 return rowsAffected == 0
                     ? Results.NotFound(new { Message = $"User with ID {id} not found." })
                     : Results.Ok(new { Message = $"User with ID {id} has been inactivated." });
+            });
+
+            app.MapPost($"{BaseRoute}/{{id:int}}/activate", async (int id, DapperContext context) =>
+            {
+                using var connection = context.CreateConnection();
+
+                var parameters = new { Id = id };
+
+                var rowsAffected = await connection.ExecuteAsync(
+                    "User_Activate",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return rowsAffected == 0
+                    ? Results.NotFound(new { Message = $"User with ID {id} not found." })
+                    : Results.Ok(new { Message = $"User with ID {id} has been activated." });
             });
         }
     }
