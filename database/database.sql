@@ -9,95 +9,140 @@ USE DataHub;
 GO
 
 -- ==============================================================
--- Table: User
+-- DROP ALL EXISTING OBJECTS
 -- ==============================================================
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [dbo].[User] (
-        Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-        Name NVARCHAR(200) NULL,
-        Username NVARCHAR(50) NOT NULL UNIQUE,
-        Email NVARCHAR(100) NOT NULL UNIQUE,
-        PasswordHash NVARCHAR(255) NOT NULL,
-        UserStatus NVARCHAR(10) NULL,
-        OpenDate DATE NULL,
-        CloseDate DATE NULL,
-        LastActiveTime DATETIME2 NULL DEFAULT GETDATE()
-    );
-END
+
+-- Drop all stored procedures
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings_Upsert]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[UserSettings_Upsert];
 GO
 
--- Add LastActiveTime column if it doesn't exist
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[User]') AND name = 'LastActiveTime')
-BEGIN
-    ALTER TABLE [dbo].[User] ADD LastActiveTime DATETIME2 NULL DEFAULT GETDATE();
-END
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings_Get]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[UserSettings_Get];
 GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserRoles_GetList]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[UserRoles_GetList];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Activate]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Activate];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Update]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Update];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Inactivate]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Inactivate];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Delete]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Delete];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Add]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Add];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_GetByUsernameOrEmail]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_GetByUsernameOrEmail];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Get]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Get];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_GetList]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_GetList];
+GO
+
+-- Drop all tables (in correct order to respect foreign keys)
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings]') AND type in (N'U'))
+    DROP TABLE [dbo].[UserSettings];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User]') AND type in (N'U'))
+    DROP TABLE [dbo].[User];
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserRoles]') AND type in (N'U'))
+    DROP TABLE [dbo].[UserRoles];
+GO
+
+-- ==============================================================
+-- CREATE ALL TABLES
+-- ==============================================================
 
 -- ==============================================================
 -- Table: UserRoles
 -- ==============================================================
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserRoles]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [dbo].[UserRoles] (
-        Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-        RoleName NVARCHAR(50) NOT NULL UNIQUE,
-        Description NVARCHAR(200) NULL,
-        CreatedDate DATETIME2 NULL DEFAULT GETDATE()
-    );
-END
+CREATE TABLE [dbo].[UserRoles] (
+    Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    RoleName NVARCHAR(50) NOT NULL UNIQUE,
+    Description NVARCHAR(200) NULL,
+    CreatedDate DATETIME2 NULL DEFAULT GETDATE()
+);
 GO
 
 -- Insert default roles
-IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'Admin')
-    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('Admin', 'System Administrator with full access');
-
-IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'Manager')
-    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('Manager', 'Manager with elevated permissions');
-
-IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'User')
-    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('User', 'Standard user with basic permissions');
-
-IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'Viewer')
-    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('Viewer', 'Read-only access user');
+INSERT INTO [UserRoles] (RoleName, Description, CreatedDate) VALUES ('Admin', 'System Administrator with full access', GETDATE());
+INSERT INTO [UserRoles] (RoleName, Description, CreatedDate) VALUES ('Manager', 'Manager with elevated permissions', GETDATE());
+INSERT INTO [UserRoles] (RoleName, Description, CreatedDate) VALUES ('User', 'Standard user with basic permissions', GETDATE());
+INSERT INTO [UserRoles] (RoleName, Description, CreatedDate) VALUES ('Viewer', 'Read-only access user', GETDATE());
 GO
 
--- Add RoleId column to User table if it doesn't exist
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[User]') AND name = 'RoleId')
-BEGIN
-    ALTER TABLE [dbo].[User] ADD RoleId BIGINT NULL;
-
-    -- Add foreign key constraint
-    ALTER TABLE [dbo].[User]
-    ADD CONSTRAINT FK_User_UserRoles FOREIGN KEY (RoleId) REFERENCES [UserRoles](Id);
-
-    -- Set default role to 'User' for existing records
-    DECLARE @DefaultRoleId BIGINT;
-    SELECT @DefaultRoleId = Id FROM [UserRoles] WHERE RoleName = 'User';
-    UPDATE [User] SET RoleId = @DefaultRoleId WHERE RoleId IS NULL;
-END
-GO
-
--- Clear existing data
-TRUNCATE TABLE [User];
+-- ==============================================================
+-- Table: User
+-- ==============================================================
+CREATE TABLE [dbo].[User] (
+    Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    Name NVARCHAR(200) NULL,
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    Email NVARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    UserStatus NVARCHAR(10) NULL,
+    OpenDate DATE NULL,
+    CloseDate DATE NULL,
+    LastActiveTime DATETIME2 NULL DEFAULT GETDATE(),
+    RoleId BIGINT NULL,
+    CONSTRAINT FK_User_UserRoles FOREIGN KEY (RoleId) REFERENCES [UserRoles](Id)
+);
 GO
 
 -- Insert initial users
-IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'admin')
-    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
-    VALUES ('Admin', 'admin', 'admin@example.com', '$2a$04$yydSfPlMRY1y5y6oMGcpIOyCFBs4TmjnoW7zrC4f2RcPpE2PJeEZS', 'A', '2025-01-01', NULL);
+DECLARE @AdminRoleId BIGINT, @UserRoleId BIGINT;
+SELECT @AdminRoleId = Id FROM [UserRoles] WHERE RoleName = 'Admin';
+SELECT @UserRoleId = Id FROM [UserRoles] WHERE RoleName = 'User';
 
-IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'juan')
-    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
-    VALUES ('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', NULL);
+INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate, RoleId)
+VALUES ('Admin', 'admin', 'admin@example.com', '$2a$04$yydSfPlMRY1y5y6oMGcpIOyCFBs4TmjnoW7zrC4f2RcPpE2PJeEZS', 'A', '2025-01-01', NULL, @AdminRoleId);
 
-IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'monitor')
-    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
-    VALUES ('Monitor User', 'monitor', 'monitor@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', NULL);
+INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate, RoleId)
+VALUES ('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', NULL, @AdminRoleId);
 
-IF NOT EXISTS (SELECT 1 FROM [User] WHERE Username = 'pedro')
-    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate) 
-    VALUES ('Pedro Martinez', 'pedro', 'pedro@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-07-01', NULL);
+INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate, RoleId)
+VALUES ('Monitor User', 'monitor', 'monitor@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-01-01', NULL, @UserRoleId);
+
+INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, CloseDate, RoleId)
+VALUES ('Pedro Martinez', 'pedro', 'pedro@example.com', '$2a$12$gG2WW0mHAHCVg1mKShZyVO78olNfaVKwrYMN.nydyA1xZmBNXgAvC', 'A', '2025-07-01', NULL, @UserRoleId);
+GO
+
+-- ==============================================================
+-- Table: UserSettings
+-- ==============================================================
+CREATE TABLE [dbo].[UserSettings] (
+    Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    UserId BIGINT NOT NULL,
+    Language NVARCHAR(10) DEFAULT 'en',
+    DateFormat NVARCHAR(20) DEFAULT 'yyyy-mm-dd',
+    SiderColor NVARCHAR(20) DEFAULT '#001529',
+    Theme NVARCHAR(10) DEFAULT 'light',
+    CreatedDate DATETIME2 DEFAULT GETDATE(),
+    UpdatedDate DATETIME2 DEFAULT GETDATE(),
+    CONSTRAINT FK_UserSettings_User FOREIGN KEY (UserId) REFERENCES [User](Id) ON DELETE CASCADE,
+    CONSTRAINT UQ_UserSettings_UserId UNIQUE (UserId)
+);
 GO
 
 -- --------------------------------------------------------------
@@ -299,24 +344,8 @@ END
 GO
 
 -- ==============================================================
--- Table: UserSettings
+-- UserSettings Stored Procedures
 -- ==============================================================
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [dbo].[UserSettings] (
-        Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-        UserId BIGINT NOT NULL,
-        Language NVARCHAR(10) DEFAULT 'en',
-        DateFormat NVARCHAR(20) DEFAULT 'yyyy-mm-dd',
-        SiderColor NVARCHAR(20) DEFAULT '#001529',
-        Theme NVARCHAR(10) DEFAULT 'light',
-        CreatedAt DATETIME2 DEFAULT GETDATE(),
-        UpdatedAt DATETIME2 DEFAULT GETDATE(),
-        CONSTRAINT FK_UserSettings_User FOREIGN KEY (UserId) REFERENCES [User](Id) ON DELETE CASCADE,
-        CONSTRAINT UQ_UserSettings_UserId UNIQUE (UserId)
-    );
-END
-GO
 
 -- --------------------------------------------------------------
 -- Procedure: UserSettings_Get
@@ -330,9 +359,9 @@ CREATE PROCEDURE [dbo].[UserSettings_Get]
 AS
 BEGIN
     SET NOCOUNT ON;
-    
+
     SELECT
-        us.Id, us.UserId, us.Language, us.DateFormat, us.SiderColor, us.Theme, us.CreatedAt, us.UpdatedAt
+        us.Id, us.UserId, us.Language, us.DateFormat, us.SiderColor, us.Theme, us.CreatedDate, us.UpdatedDate
     FROM [UserSettings] us
     WHERE us.UserId = @UserId;
 END
@@ -354,7 +383,7 @@ CREATE PROCEDURE [dbo].[UserSettings_Upsert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    
+
     -- Use MERGE for upsert functionality
     MERGE INTO [UserSettings] AS target
     USING (SELECT @UserId AS UserId) AS source
@@ -365,14 +394,14 @@ BEGIN
             DateFormat = @DateFormat,
             SiderColor = @SiderColor,
             Theme = @Theme,
-            UpdatedAt = GETDATE()
+            UpdatedDate = GETDATE()
     WHEN NOT MATCHED THEN
         INSERT (UserId, Language, DateFormat, SiderColor, Theme)
         VALUES (@UserId, @Language, @DateFormat, @SiderColor, @Theme);
-    
+
     -- Return the updated/inserted settings
     SELECT
-        us.Id, us.UserId, us.Language, us.DateFormat, us.SiderColor, us.Theme, us.CreatedAt, us.UpdatedAt
+        us.Id, us.UserId, us.Language, us.DateFormat, us.SiderColor, us.Theme, us.CreatedDate, us.UpdatedDate
     FROM [UserSettings] us
     WHERE us.UserId = @UserId;
 END
