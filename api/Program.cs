@@ -40,6 +40,7 @@ namespace App.Server
             builder.Services.ConfigureHttpJsonOptions(options =>
             {
                 options.SerializerOptions.PropertyNameCaseInsensitive = true;
+                options.SerializerOptions.PropertyNamingPolicy = null; // Use PascalCase (C# property names as-is)
             });
 
             // Add DapperContext
