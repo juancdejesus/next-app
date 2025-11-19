@@ -40,11 +40,11 @@ namespace App.Server.Endpoints
 
                     return Results.Ok(new
                     {
-                        username = userName,
-                        domain = domain,
-                        fullName = username,
-                        isAuthenticated = true,
-                        authenticationType = identity.AuthenticationType
+                        Username = userName,
+                        Domain = domain,
+                        FullName = username,
+                        IsAuthenticated = true,
+                        identity.AuthenticationType
                     });
                 }
 
@@ -54,12 +54,12 @@ namespace App.Server.Endpoints
 
                 return Results.Ok(new
                 {
-                    username = windowsUsername,
-                    domain = domainUsername,
-                    fullName = $"{domainUsername}\\{windowsUsername}",
-                    isAuthenticated = false,
-                    authenticationType = "ServerProcess",
-                    note = "Windows Authentication not detected. Run with IIS Express and ensure windowsAuthentication=true in launchSettings.json"
+                    Username = windowsUsername,
+                    Domain = domainUsername,
+                    FullName = $"{domainUsername}\\{windowsUsername}",
+                    IsAuthenticated = false,
+                    AuthenticationType = "ServerProcess",
+                    Note = "Windows Authentication not detected. Run with IIS Express and ensure windowsAuthentication=true in launchSettings.json"
                 });
             });
 
