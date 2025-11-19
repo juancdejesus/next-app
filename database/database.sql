@@ -161,7 +161,8 @@ BEGIN
         u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate, u.LastActiveTime,
         u.RoleId, r.RoleName AS Role
     FROM [User] u
-    LEFT JOIN [UserRoles] r ON u.RoleId = r.Id;
+    LEFT JOIN [UserRoles] r ON u.RoleId = r.Id
+    ORDER BY u.Name ASC;
 END
 GO
 
