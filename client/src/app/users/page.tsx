@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { App, Table, Spin, Button, Modal, Form, Input, Select, DatePicker, Tag, Popconfirm, Tooltip, Avatar, theme } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined, UserOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, StopOutlined, UserOutlined, SearchOutlined, MoreOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/AppLayout';
@@ -34,6 +34,7 @@ interface User {
   OpenDate: Date;
   CloseDate: Date | null;
   LastActiveTime: Date | null;
+  Role?: string; // Added for role column
 }
 
 interface UserFormValues {
@@ -57,7 +58,7 @@ export default function UsersPage() {
   const [form] = Form.useForm();
   const { message } = App.useApp();
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer, colorBorderSecondary, colorTextSecondary, colorText, colorBgElevated },
   } = theme.useToken(); 
   
   useEffect(() => {
@@ -220,15 +221,15 @@ export default function UsersPage() {
       render: (_: unknown, record: User) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Avatar
-            size={40}
+            size={36}
             style={{ backgroundColor: getAvatarColor(record.Name || 'U'), flexShrink: 0 }}
-            icon={<UserOutlined />}
+            // icon={<UserOutlined />} // Using name initial instead
           >
             {record.Name?.charAt(0).toUpperCase()}
           </Avatar>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontWeight: 500, fontSize: '14px' }}>{record.Name}</span>
-            <span style={{ fontSize: '14px', color: '#999' }}>{record.Email}</span>
+            <span style={{ fontWeight: 500, fontSize: '14px', color: colorText }}>{record.Name}</span>
+            <span style={{ fontSize: '14px', color: colorTextSecondary }}>{record.Email}</span>
           </div>
         </div>
       ),
@@ -242,7 +243,13 @@ export default function UsersPage() {
       title: t('users.table.role'),
       dataIndex: 'Role',
       key: 'Role',
-      render: (role: string) => role || '-',
+      render: (role: string) => {
+        if (!role) return '-';
+        // This is a placeholder for role-based tag colors.
+        // You can expand this logic based on your actual roles.
+        const color = role.toLowerCase().includes('admin') ? 'blue' : 'cyan';
+        return <Tag color={color}>{role}</Tag>;
+      }
     },
     {
       title: t('users.table.lastActive'),
@@ -263,6 +270,7 @@ export default function UsersPage() {
     {
       title: t('users.table.actions'),
       key: 'actions',
+      align: 'right',
       width: 150,
       render: (_: unknown, record: User) => (
         <div style={{ display: 'flex', gap: 0 }} onClick={(e) => e.stopPropagation()}>
@@ -272,7 +280,6 @@ export default function UsersPage() {
               icon={<EditOutlined />}
               onClick={() => showEditModal(record)}
             >
-              {/* {t('users.table.edit')} */}
             </Button>
           </Tooltip>
           <Popconfirm
@@ -288,7 +295,6 @@ export default function UsersPage() {
                 icon={<StopOutlined />}
                 style={{ color: '#faad14' }}
               >
-                {/* {t('users.table.inactivate')} */}
               </Button>
             </Tooltip>
           </Popconfirm>
@@ -305,7 +311,6 @@ export default function UsersPage() {
                 danger
                 icon={<DeleteOutlined />}
               >
-                {/* {t('users.table.delete')} */}
               </Button>
             </Tooltip>
           </Popconfirm>
@@ -316,26 +321,25 @@ export default function UsersPage() {
 
   return (
     <AppLayout>
-      <div>
+      <div style={{ padding: '0 24px 24px 24px' }}>
         {/* Page Header */}
         
-        {/* <div style={{ marginBottom: 10 }}>
-          <h1 style={{ fontSize: 30, fontWeight: 600, margin: 0, marginBottom: 8 }}>
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0, marginBottom: 4 }}>
             {t('users.title')}
           </h1>
           <p style={{ fontSize: 14, color: '#999', margin: 0 }}>
             {t('users.description')}
           </p>
-        </div> */}
+        </div>
 
         {/* Toolbar - Search and Add Button */}
         <div style={{
           marginBottom: 24,
-          padding: '24px',
-          border: '1px solid #d9d9d9',
+          padding: '16px',
+          border: `1px solid ${colorBorderSecondary}`,
           borderRadius: '8px',
           backgroundColor: colorBgContainer,
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
             <Input
@@ -343,7 +347,7 @@ export default function UsersPage() {
               prefix={<SearchOutlined style={{ color: '#999' }} />}
               value={searchText}
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ maxWidth: 400, width: '100%' }}
+              style={{ maxWidth: 450, width: '100%' }}
               allowClear
             />
             <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
@@ -354,27 +358,23 @@ export default function UsersPage() {
 
         {/* Users Table */}
         <Spin spinning={loading}>
-          <Table
-            columns={columns}
-            dataSource={filteredUsers}
-            rowKey="Id"
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total) => t('users.table.total', { count: total }),
-            }}
-            onRow={(record) => ({
-              style: { cursor: 'pointer' },
-              onClick: () => showEditModal(record),
-            })}
-            className="users-table"
-            style={{
-              border: '1px solid #d9d9d9',
-              borderRadius: '8px',
-              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
-              overflow: 'hidden'
-            }}
-          />
+          <div style={{ border: `1px solid ${colorBorderSecondary}`, borderRadius: '8px', overflow: 'hidden', background: colorBgContainer }}>
+            <Table
+              columns={columns}
+              dataSource={filteredUsers}
+              rowKey="Id"
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => t('users.table.totalRange', { start: range[0], end: range[1], total }),
+              }}
+              onRow={(record) => ({
+                style: { cursor: 'pointer' },
+                onClick: () => showEditModal(record),
+              })}
+              className="users-table"
+            />
+          </div>
         </Spin>
 
         <Modal
