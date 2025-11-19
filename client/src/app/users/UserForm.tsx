@@ -1,0 +1,119 @@
+import { Modal, Form, Input, Select, DatePicker, Button } from 'antd';
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import type { User, UserFormValues } from '@/services/userService';
+
+interface UserFormProps {
+  open: boolean;
+  editingUser: User | null;
+  onCancel: () => void;
+  onSubmit: (values: UserFormValues) => Promise<void>;
+}
+
+export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProps) => {
+  const { t } = useTranslation();
+  const [form] = Form.useForm();
+
+  const handleCancel = () => {
+    form.resetFields();
+    onCancel();
+  };
+
+  const handleSubmit = async (values: UserFormValues) => {
+    await onSubmit(values);
+    form.resetFields();
+  };
+
+  // Set form values when editing user changes
+  const initialValues = editingUser
+    ? {
+        name: editingUser.Name,
+        username: editingUser.Username,
+        email: editingUser.Email,
+        user_status: editingUser.UserStatus,
+        open_date: editingUser.OpenDate ? dayjs(editingUser.OpenDate) : null,
+        close_date: editingUser.CloseDate ? dayjs(editingUser.CloseDate) : null,
+      }
+    : { user_status: 'A' };
+
+  return (
+    <Modal
+      title={t(editingUser ? 'users.modal.editTitle' : 'users.modal.title')}
+      open={open}
+      onCancel={handleCancel}
+      footer={null}
+      width={600}
+      destroyOnClose
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={initialValues}
+      >
+        <Form.Item
+          label={t('users.modal.name')}
+          name="name"
+          rules={[{ required: true, message: t('users.modal.nameRequired') }]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label={t('users.modal.username')}
+          name="username"
+          rules={[{ required: true, message: t('users.modal.usernameRequired') }]}
+        >
+          <Input disabled={!!editingUser} />
+        </Form.Item>
+
+        <Form.Item
+          label={t('users.modal.email')}
+          name="email"
+          rules={[
+            { required: true, message: t('users.modal.emailRequired') },
+            { type: 'email', message: t('users.modal.emailInvalid') },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label={t('users.modal.password')}
+          name="password"
+          rules={[{ required: !editingUser, message: t('users.modal.passwordRequired') }]}
+        >
+          <Input.Password placeholder={editingUser ? t('users.modal.passwordPlaceholder') : ''} />
+        </Form.Item>
+
+        <Form.Item
+          label={t('users.modal.status')}
+          name="user_status"
+          rules={[{ required: true, message: t('users.modal.statusRequired') }]}
+        >
+          <Select>
+            <Select.Option value="A">{t('users.table.active')}</Select.Option>
+            <Select.Option value="I">{t('users.table.inactive')}</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item label={t('users.modal.openDate')} name="open_date">
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item label={t('users.modal.closeDate')} name="close_date">
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <Button onClick={handleCancel}>{t('users.modal.cancel')}</Button>
+            <Button type="primary" htmlType="submit">
+              {t(editingUser ? 'users.modal.update' : 'users.modal.create')}
+            </Button>
+          </div>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
