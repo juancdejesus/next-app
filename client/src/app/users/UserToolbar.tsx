@@ -42,18 +42,20 @@ export const UserToolbar = ({ searchText, onSearchChange, onAddClick }: UserTool
           </p>
         </div>
 
-        <Input
-          placeholder={t('users.searchPlaceholder')}
-          prefix={<SearchOutlined style={{ color: colorTextSecondary }} />}
-          value={searchText}
-          onChange={(e) => onSearchChange(e.target.value)}
-          style={{ width: '100%', maxWidth: '450px', flex: 1, minWidth: '200px' }}
-          allowClear
-        />
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <Input
+            placeholder={t('users.searchPlaceholder')}
+            prefix={<SearchOutlined style={{ color: colorTextSecondary }} />}
+            value={searchText}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{ width: '300px' }}
+            allowClear
+          />
 
-        <Button type="primary" icon={<PlusOutlined />} onClick={onAddClick} style={{ flexShrink: 0 }}>
-          {t('users.addUser')}
-        </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onAddClick}>
+            {t('users.addUser')}
+          </Button>
+        </div>
       </div>
     </div>
   );

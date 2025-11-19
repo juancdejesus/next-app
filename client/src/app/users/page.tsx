@@ -58,6 +58,7 @@ export default function UsersPage() {
       user_status: values.user_status,
       open_date: values.open_date ? values.open_date.toISOString() : new Date().toISOString(),
       close_date: values.close_date ? values.close_date.toISOString() : null,
+      role_id: values.role_id,
     };
 
     if (editingUser) {

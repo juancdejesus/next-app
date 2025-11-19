@@ -115,7 +115,8 @@ namespace App.Server.Endpoints
                     Name = user.name,
                     Username = user.username,
                     Email = user.email,
-                    PasswordHash = user.password_hash
+                    PasswordHash = user.password_hash,
+                    RoleId = user.role_id
                 };
 
                 var newUser = await connection.QueryFirstOrDefaultAsync<dynamic>(
@@ -142,7 +143,8 @@ namespace App.Server.Endpoints
                     Name = user.name,
                     Username = user.username,
                     Email = user.email,
-                    UserStatus = user.user_status
+                    UserStatus = user.user_status,
+                    RoleId = user.role_id
                 };
 
                 var rowsAffected = await connection.ExecuteAsync(

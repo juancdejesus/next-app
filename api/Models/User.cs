@@ -12,5 +12,8 @@ namespace App.Server.Models
         public string? user_status { get; set; }
         public DateTime? open_date { get; set; }
         public DateTime? close_date { get; set; }
+        public DateTime? last_active_time { get; set; }
+        public long? role_id { get; set; }
+        public string? role { get; set; }  // RoleName from JOIN
     }
 }

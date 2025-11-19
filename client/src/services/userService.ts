@@ -8,6 +8,7 @@ export interface User {
   OpenDate: Date;
   CloseDate: Date | null;
   LastActiveTime: Date | null;
+  RoleId?: number;
   Role?: string;
 }
 
@@ -19,6 +20,7 @@ export interface UserFormValues {
   user_status: string;
   open_date: Date;
   close_date: Date | null;
+  role_id?: number;
 }
 
 export interface CreateUserPayload {
@@ -30,6 +32,14 @@ export interface CreateUserPayload {
   user_status: string;
   open_date: string;
   close_date: string | null;
+  role_id?: number;
+}
+
+export interface UserRole {
+  id: number;
+  role_name: string;
+  description: string;
+  created_date: Date;
 }
 
 const getApiUrl = (): string => {
@@ -116,4 +126,18 @@ export const inactivateUser = async (id: number): Promise<void> => {
   if (!response.ok) {
     throw new Error('Failed to inactivate user');
   }
+};
+
+/**
+ * Fetches all available user roles
+ */
+export const fetchRoles = async (): Promise<UserRole[]> => {
+  const apiUrl = getApiUrl();
+  const response = await fetch(`${apiUrl}/roles`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch roles');
+  }
+
+  return response.json();
 };

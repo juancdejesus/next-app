@@ -34,6 +34,50 @@ BEGIN
 END
 GO
 
+-- ==============================================================
+-- Table: UserRoles
+-- ==============================================================
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserRoles]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[UserRoles] (
+        Id BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        RoleName NVARCHAR(50) NOT NULL UNIQUE,
+        Description NVARCHAR(200) NULL,
+        CreatedDate DATETIME2 NULL DEFAULT GETDATE()
+    );
+END
+GO
+
+-- Insert default roles
+IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'Admin')
+    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('Admin', 'System Administrator with full access');
+
+IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'Manager')
+    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('Manager', 'Manager with elevated permissions');
+
+IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'User')
+    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('User', 'Standard user with basic permissions');
+
+IF NOT EXISTS (SELECT 1 FROM [UserRoles] WHERE RoleName = 'Viewer')
+    INSERT INTO [UserRoles] (RoleName, Description) VALUES ('Viewer', 'Read-only access user');
+GO
+
+-- Add RoleId column to User table if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[User]') AND name = 'RoleId')
+BEGIN
+    ALTER TABLE [dbo].[User] ADD RoleId BIGINT NULL;
+
+    -- Add foreign key constraint
+    ALTER TABLE [dbo].[User]
+    ADD CONSTRAINT FK_User_UserRoles FOREIGN KEY (RoleId) REFERENCES [UserRoles](Id);
+
+    -- Set default role to 'User' for existing records
+    DECLARE @DefaultRoleId BIGINT;
+    SELECT @DefaultRoleId = Id FROM [UserRoles] WHERE RoleName = 'User';
+    UPDATE [User] SET RoleId = @DefaultRoleId WHERE RoleId IS NULL;
+END
+GO
+
 -- Clear existing data
 TRUNCATE TABLE [User];
 GO
@@ -69,8 +113,10 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
-        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate, u.LastActiveTime
-    FROM [User] u;
+        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate, u.LastActiveTime,
+        u.RoleId, r.RoleName AS Role
+    FROM [User] u
+    LEFT JOIN [UserRoles] r ON u.RoleId = r.Id;
 END
 GO
 
@@ -88,8 +134,10 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
-        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate, u.LastActiveTime
+        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.OpenDate, u.CloseDate, u.LastActiveTime,
+        u.RoleId, r.RoleName AS Role
     FROM [User] u
+    LEFT JOIN [UserRoles] r ON u.RoleId = r.Id
     WHERE u.Id = @Id;
 END
 GO
@@ -125,14 +173,21 @@ CREATE PROCEDURE [dbo].[User_Add]
     @Name NVARCHAR(200),
     @Username NVARCHAR(50),
     @Email NVARCHAR(100),
-    @PasswordHash NVARCHAR(255)
+    @PasswordHash NVARCHAR(255),
+    @RoleId BIGINT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    
-    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate) 
-    VALUES (@Name, @Username, @Email, @PasswordHash, 'A', CAST(GETDATE() AS DATE));
-    
+
+    -- If RoleId is not provided, default to 'User' role
+    IF @RoleId IS NULL
+    BEGIN
+        SELECT @RoleId = Id FROM [UserRoles] WHERE RoleName = 'User';
+    END
+
+    INSERT INTO [User] (Name, Username, Email, PasswordHash, UserStatus, OpenDate, RoleId)
+    VALUES (@Name, @Username, @Email, @PasswordHash, 'A', CAST(GETDATE() AS DATE), @RoleId);
+
     SELECT SCOPE_IDENTITY() AS Id;
 END
 GO
@@ -185,17 +240,61 @@ CREATE PROCEDURE [dbo].[User_Update]
     @Name NVARCHAR(200),
     @Username NVARCHAR(50),
     @Email NVARCHAR(100),
-    @UserStatus NVARCHAR(10)
+    @UserStatus NVARCHAR(10),
+    @RoleId BIGINT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    
-    UPDATE [User] 
-    SET Name = @Name, 
-        Username = @Username, 
-        Email = @Email, 
-        UserStatus = @UserStatus
+
+    UPDATE [User]
+    SET Name = @Name,
+        Username = @Username,
+        Email = @Email,
+        UserStatus = @UserStatus,
+        RoleId = ISNULL(@RoleId, RoleId)  -- Only update if provided
     WHERE Id = @Id;
+END
+GO
+
+-- --------------------------------------------------------------
+-- Procedure: User_Activate
+-- --------------------------------------------------------------
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_Activate]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_Activate];
+GO
+
+CREATE PROCEDURE [dbo].[User_Activate]
+    @Id BIGINT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE [User]
+    SET UserStatus = 'A', CloseDate = NULL
+    WHERE Id = @Id;
+END
+GO
+
+-- ==============================================================
+-- UserRoles Stored Procedures
+-- ==============================================================
+
+-- --------------------------------------------------------------
+-- Procedure: UserRoles_GetList
+-- --------------------------------------------------------------
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserRoles_GetList]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[UserRoles_GetList];
+GO
+
+CREATE PROCEDURE [dbo].[UserRoles_GetList]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        r.Id, r.RoleName, r.Description, r.CreatedDate
+    FROM [UserRoles] r
+    ORDER BY r.RoleName;
 END
 GO
 
