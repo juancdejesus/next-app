@@ -218,6 +218,13 @@ export default function UsersPage() {
       title: t('users.table.user'),
       dataIndex: 'Name',
       key: 'Name',
+      // Apply padding to both the header (th) and body (td) cells of this column
+      onHeaderCell: () => ({
+        style: { paddingLeft: '32px' } // Default 16px + 16px custom
+      }),
+      onCell: () => ({
+        style: { paddingLeft: '32px' } // Default 16px + 16px custom
+      }),
       render: (_: unknown, record: User) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Avatar
@@ -273,7 +280,7 @@ export default function UsersPage() {
       align: 'right',
       width: 150,
       render: (_: unknown, record: User) => (
-        <div style={{ display: 'flex', gap: 0 }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', gap: 0, justifyContent: 'flex-end' }} onClick={(e) => e.stopPropagation()}>
           <Tooltip title={t('users.table.edit')}>
             <Button
               type="text"
@@ -322,35 +329,35 @@ export default function UsersPage() {
   return (
     <AppLayout>
       <div style={{ padding: '0 24px 24px 24px' }}>
-        {/* Page Header */}
-        
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0, marginBottom: 4 }}>
-            {t('users.title')}
-          </h1>
-          <p style={{ fontSize: 14, color: '#999', margin: 0 }}>
-            {t('users.description')}
-          </p>
-        </div>
-
         {/* Toolbar - Search and Add Button */}
         <div style={{
-          marginBottom: 24,
-          padding: '16px',
+          marginBottom: 10,
+          padding: '16px 24px',
           border: `1px solid ${colorBorderSecondary}`,
           borderRadius: '8px',
           backgroundColor: colorBgContainer,
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+            {/* Left section: Title and Description */}
+            <div>
+              <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0, marginBottom: 0 }}>
+                {t('users.title')}
+              </h1>
+              <p style={{ fontSize: 14, color: colorTextSecondary, margin: 0 }}>
+                {t('users.description')}
+              </p>
+            </div>
+            {/* Center section: Search Input */}
             <Input
               placeholder={t('users.searchPlaceholder')}
-              prefix={<SearchOutlined style={{ color: '#999' }} />}
+              prefix={<SearchOutlined style={{ color: colorTextSecondary }} />}
               value={searchText}
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ maxWidth: 450, width: '100%' }}
+              style={{ width: '100%', maxWidth: '450px', flex: 1, minWidth: '200px' }}
               allowClear
             />
-            <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+            {/* Right section: Add Button */}
+            <Button type="primary" icon={<PlusOutlined />} onClick={showModal} style={{ flexShrink: 0 }}>
               {t('users.addUser')}
             </Button>
           </div>
@@ -366,13 +373,16 @@ export default function UsersPage() {
               pagination={{
                 pageSize: 10,
                 showSizeChanger: true,
-                showTotal: (total, range) => t('users.table.totalRange', { start: range[0], end: range[1], total }),
+                showTotal: (total) => t('users.table.total', { count: total }),
+                style: { padding: '0px 16px 16px 16px', marginBottom: 0 }
               }}
               onRow={(record) => ({
                 style: { cursor: 'pointer' },
                 onClick: () => showEditModal(record),
               })}
               className="users-table"
+              size="middle"
+              
             />
           </div>
         </Spin>
