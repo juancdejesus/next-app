@@ -2,8 +2,8 @@ namespace api.Models;
 
 public class UserRole
 {
-    public long id { get; set; }
-    public string? role_name { get; set; }
-    public string? description { get; set; }
-    public DateTime? created_date { get; set; }
+    public long Id { get; set; }
+    public string? RoleName { get; set; }
+    public string? Description { get; set; }
+    public DateTime? CreatedDate { get; set; }
 }

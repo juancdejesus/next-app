@@ -12,10 +12,13 @@ export const useUsers = () => {
 
   /**
    * Fetches all users from the API
+   * @param showLoading - Whether to show loading state (default: true)
    */
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       const data = await userService.fetchUsers();
       setUsers(data);
       return data;
@@ -24,7 +27,9 @@ export const useUsers = () => {
       message.error(t('users.fetchError'));
       return [];
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, [message, t]);
 
@@ -36,7 +41,7 @@ export const useUsers = () => {
       try {
         await userService.createUser(payload);
         message.success(t('users.createSuccess'));
-        await fetchUsers();
+        await fetchUsers(false); // Don't show loading spinner
       } catch (error) {
         console.error('Error creating user:', error);
         message.error(t('users.createError'));
@@ -54,7 +59,7 @@ export const useUsers = () => {
       try {
         await userService.updateUser(id, payload);
         message.success(t('users.updateSuccess'));
-        await fetchUsers();
+        await fetchUsers(false); // Don't show loading spinner
       } catch (error) {
         console.error('Error updating user:', error);
         message.error(t('users.updateError'));
@@ -72,7 +77,7 @@ export const useUsers = () => {
       try {
         await userService.deleteUser(id);
         message.success(t('users.deleteSuccess'));
-        await fetchUsers();
+        await fetchUsers(false); // Don't show loading spinner
       } catch (error) {
         console.error('Error deleting user:', error);
         message.error(t('users.deleteError'));
@@ -90,7 +95,7 @@ export const useUsers = () => {
       try {
         await userService.inactivateUser(id);
         message.success(t('users.inactivateSuccess'));
-        await fetchUsers();
+        await fetchUsers(false); // Don't show loading spinner
       } catch (error) {
         console.error('Error inactivating user:', error);
         message.error(t('users.inactivateError'));

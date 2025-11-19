@@ -36,10 +36,10 @@ export interface CreateUserPayload {
 }
 
 export interface UserRole {
-  id: number;
-  role_name: string;
-  description: string;
-  created_date: Date;
+  Id: number;
+  RoleName: string;
+  Description: string;
+  CreatedDate: Date;
 }
 
 const getApiUrl = (): string => {
