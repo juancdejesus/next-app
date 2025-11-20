@@ -15,10 +15,10 @@ namespace App.Server.Endpoints
             app.MapGet($"{BaseRoute}/{{userId:int}}/settings", async (int userId, DapperContext context) =>
             {
                 using var connection = context.CreateConnection();
-                var parameters = new { p_user_id = userId };
+                var parameters = new { UserId = userId };
 
                 var settings = await connection.QueryFirstOrDefaultAsync<UserSettings>(
-                    "proc_get_user_settings",
+                    "UserSettings_Get",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -28,11 +28,11 @@ namespace App.Server.Endpoints
                     // Return default settings if none exist
                     return Results.Ok(new UserSettings
                     {
-                        user_id = userId,
-                        language = "en",
-                        date_format = "yyyy-mm-dd",
-                        sider_color = "#001529",
-                        theme = "light"
+                        UserId = userId,
+                        Language = "en",
+                        DateFormat = "yyyy-mm-dd",
+                        SiderColor = "#001529",
+                        Theme = "light"
                     });
                 }
 
@@ -46,15 +46,15 @@ namespace App.Server.Endpoints
 
                 var parameters = new
                 {
-                    p_user_id = userId,
-                    p_language = request.language ?? "en",
-                    p_date_format = request.date_format ?? "yyyy-mm-dd",
-                    p_sider_color = request.sider_color ?? "#001529",
-                    p_theme = request.theme ?? "light"
+                    UserId = userId,
+                    Language = request.Language ?? "en",
+                    DateFormat = request.DateFormat ?? "yyyy-mm-dd",
+                    SiderColor = request.SiderColor ?? "#001529",
+                    Theme = request.Theme ?? "light"
                 };
 
                 var updatedSettings = await connection.QueryFirstOrDefaultAsync<UserSettings>(
-                    "proc_upsert_user_settings",
+                    "UserSettings_Upsert",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -77,10 +77,10 @@ namespace App.Server.Endpoints
                 }
 
                 using var connection = context.CreateConnection();
-                var parameters = new { p_user_id = userId.Value };
+                var parameters = new { UserId = userId.Value };
 
                 var settings = await connection.QueryFirstOrDefaultAsync<UserSettings>(
-                    "proc_get_user_settings",
+                    "UserSettings_Get",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
@@ -90,11 +90,11 @@ namespace App.Server.Endpoints
                     // Return default settings if none exist
                     return Results.Ok(new UserSettings
                     {
-                        user_id = userId.Value,
-                        language = "en",
-                        date_format = "yyyy-mm-dd",
-                        sider_color = "#001529",
-                        theme = "light"
+                        UserId = userId.Value,
+                        Language = "en",
+                        DateFormat = "yyyy-mm-dd",
+                        SiderColor = "#001529",
+                        Theme = "light"
                     });
                 }
 

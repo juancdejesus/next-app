@@ -4,22 +4,22 @@ namespace App.Server.Models
 {
     public class UserSettings
     {
-        public long id { get; set; }
-        public long user_id { get; set; }
-        public string? language { get; set; }
-        public string? date_format { get; set; }
-        public string? sider_color { get; set; }
-        public string? theme { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
+        public long Id { get; set; }
+        public long UserId { get; set; }
+        public string? Language { get; set; }
+        public string? DateFormat { get; set; }
+        public string? SiderColor { get; set; }
+        public string? Theme { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
     }
 
     public class UserSettingsRequest
     {
-        public long user_id { get; set; }
-        public string? language { get; set; }
-        public string? date_format { get; set; }
-        public string? sider_color { get; set; }
-        public string? theme { get; set; }
+        public long UserId { get; set; }
+        public string? Language { get; set; }
+        public string? DateFormat { get; set; }
+        public string? SiderColor { get; set; }
+        public string? Theme { get; set; }
     }
 }

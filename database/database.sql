@@ -351,10 +351,6 @@ GO
 -- --------------------------------------------------------------
 -- Procedure: UserSettings_Get
 -- --------------------------------------------------------------
-IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings_Get]') AND type in (N'P', N'PC'))
-    DROP PROCEDURE [dbo].[UserSettings_Get];
-GO
-
 CREATE PROCEDURE [dbo].[UserSettings_Get]
     @UserId BIGINT
 AS
@@ -371,10 +367,6 @@ GO
 -- --------------------------------------------------------------
 -- Procedure: UserSettings_Upsert
 -- --------------------------------------------------------------
-IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserSettings_Upsert]') AND type in (N'P', N'PC'))
-    DROP PROCEDURE [dbo].[UserSettings_Upsert];
-GO
-
 CREATE PROCEDURE [dbo].[UserSettings_Upsert]
     @UserId BIGINT,
     @Language NVARCHAR(10),
