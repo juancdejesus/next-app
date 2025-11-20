@@ -2,7 +2,6 @@ using App.Server.Models;
 using App.Server.Utils;
 using Dapper;
 using System.Data;
-using BCrypt.Net;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -107,15 +106,11 @@ namespace App.Server.Endpoints
             {
                 using var connection = context.CreateConnection();
 
-                // Hash the password before storing
-                user.password_hash = BCrypt.Net.BCrypt.HashPassword(user.password_hash);
-
                 var parameters = new
                 {
                     Name = user.name,
                     Username = user.username,
                     Email = user.email,
-                    PasswordHash = user.password_hash,
                     RoleId = user.role_id
                 };
 
@@ -221,6 +216,4 @@ namespace App.Server.Endpoints
             });
         }
     }
-
-    public record ChangePasswordRequest(string OldPassword, string NewPassword);
 }

@@ -54,10 +54,7 @@ export default function UsersPage() {
       name: values.name,
       username: values.username,
       email: values.email,
-      password_hash: values.password || (editingUser ? '' : 'default'),
       user_status: values.user_status,
-      open_date: values.open_date ? values.open_date.toISOString() : new Date().toISOString(),
-      close_date: values.close_date ? values.close_date.toISOString() : null,
       role_id: values.role_id,
     };
 

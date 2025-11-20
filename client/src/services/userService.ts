@@ -3,10 +3,7 @@ export interface User {
   Name: string;
   Username: string;
   Email: string;
-  Password: string;
   UserStatus: string;
-  OpenDate: Date;
-  CloseDate: Date | null;
   LastActiveTime: Date | null;
   RoleId?: number;
   Role?: string;
@@ -16,10 +13,7 @@ export interface UserFormValues {
   name: string;
   username: string;
   email: string;
-  password: string;
   user_status: string;
-  open_date: Date;
-  close_date: Date | null;
   role_id?: number;
 }
 
@@ -28,10 +22,7 @@ export interface CreateUserPayload {
   name: string;
   username: string;
   email: string;
-  password_hash: string;
   user_status: string;
-  open_date: string;
-  close_date: string | null;
   role_id?: number;
 }
 

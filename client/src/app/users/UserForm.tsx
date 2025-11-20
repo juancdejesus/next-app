@@ -1,8 +1,7 @@
-import { Modal, Form, Input, Select, DatePicker, Button, Row, Col } from 'antd';
-import { UserOutlined, MailOutlined, LockOutlined, SolutionOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, Select, Button, Row, Col } from 'antd';
+import { UserOutlined, MailOutlined, SolutionOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import type { User, UserFormValues, UserRole } from '@/services/userService';
 import { fetchRoles } from '@/services/userService';
 
@@ -46,8 +45,6 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
           email: editingUser.Email,
           user_status: editingUser.UserStatus,
           role_id: editingUser.RoleId,
-          open_date: editingUser.OpenDate ? dayjs(editingUser.OpenDate) : null,
-          close_date: editingUser.CloseDate ? dayjs(editingUser.CloseDate) : null,
         });
       } else {
         form.resetFields();
@@ -118,18 +115,6 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
               <Input prefix={<MailOutlined />} />
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item
-              label={t('users.modal.password')}
-              name="password"
-              rules={[{ required: !editingUser, message: t('users.modal.passwordRequired') }]}
-            >
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder={editingUser ? t('users.modal.passwordPlaceholder') : ''}
-              />
-            </Form.Item>
-          </Col>
         </Row>
 
         <Row gutter={24}>
@@ -162,19 +147,6 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
                 <Select.Option value="A">{t('users.table.active')}</Select.Option>
                 <Select.Option value="I">{t('users.table.inactive')}</Select.Option>
               </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={24}>
-          <Col span={12}>
-            <Form.Item label={t('users.modal.openDate')} name="open_date">
-              <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label={t('users.modal.closeDate')} name="close_date">
-              <DatePicker style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>
