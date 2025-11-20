@@ -38,6 +38,8 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
         ]);
 
         setRoles(rolesData);
+        // Filter to only show active employees
+        // const activeEmployees = employeesData.filter(emp => emp.EmployeeStatus === 'A');
         setEmployees(employeesData);
       } catch (error) {
         console.error('Error fetching data:', error);

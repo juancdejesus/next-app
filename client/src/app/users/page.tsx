@@ -50,13 +50,9 @@ export default function UsersPage() {
 
   const handleSubmit = async (values: UserFormValues) => {
     const payload: CreateUserPayload = {
-      Id: editingUser ? editingUser.Id : 0,
-      Name: values.Name,
-      Username: values.Username,
-      Email: values.Email,
-      PhotoURL: values.PhotoURL,
-      UserStatus: values.UserStatus,
+      EmployeeId: values.EmployeeId,
       RoleId: values.RoleId,
+      UserStatus: values.UserStatus,
     };
 
     console.log('Form values:', values);

@@ -1,3 +1,6 @@
+import { constants } from "buffer";
+import { log } from "console";
+
 export interface User {
   Id: number;
   EmployeeId: number;
@@ -86,6 +89,11 @@ export const createUser = async (payload: CreateUserPayload): Promise<void> => {
     RoleId: payload.RoleId,
     UserStatus: payload.UserStatus,
   };
+  
+
+  //console.log('Create User - API Payload:', apiPayload);
+  //console.log('Create User - API URL:', `${apiUrl}/users`);
+  //console.log('Create User - Original Payload:', payload);
 
   const response = await fetch(`${apiUrl}/users`, {
     method: 'POST',
