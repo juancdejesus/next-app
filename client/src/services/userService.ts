@@ -64,15 +64,15 @@ export const fetchUsers = async (): Promise<User[]> => {
 export const createUser = async (payload: CreateUserPayload): Promise<void> => {
   const apiUrl = getApiUrl();
 
-  // Convert PascalCase to snake_case for API
+  // Send PascalCase to API (now that backend uses PascalCase)
   const apiPayload = {
-    id: payload.Id,
-    name: payload.Name,
-    username: payload.Username,
-    email: payload.Email,
-    photo_url: payload.PhotoURL,
-    user_status: payload.UserStatus,
-    role_id: payload.RoleId,
+    Id: payload.Id,
+    Name: payload.Name,
+    Username: payload.Username,
+    Email: payload.Email,
+    PhotoURL: payload.PhotoURL && payload.PhotoURL.trim() !== '' ? payload.PhotoURL : null,
+    UserStatus: payload.UserStatus,
+    RoleId: payload.RoleId,
   };
 
   const response = await fetch(`${apiUrl}/users`, {
@@ -94,16 +94,18 @@ export const createUser = async (payload: CreateUserPayload): Promise<void> => {
 export const updateUser = async (id: number, payload: CreateUserPayload): Promise<void> => {
   const apiUrl = getApiUrl();
 
-  // Convert PascalCase to snake_case for API
+  // Send PascalCase to API (now that backend uses PascalCase)
   const apiPayload = {
-    id: payload.Id,
-    name: payload.Name,
-    username: payload.Username,
-    email: payload.Email,
-    photo_url: payload.PhotoURL,
-    user_status: payload.UserStatus,
-    role_id: payload.RoleId,
+    Id: payload.Id,
+    Name: payload.Name,
+    Username: payload.Username,
+    Email: payload.Email,
+    PhotoURL: payload.PhotoURL && payload.PhotoURL.trim() !== '' ? payload.PhotoURL : null,
+    UserStatus: payload.UserStatus,
+    RoleId: payload.RoleId,
   };
+
+  console.log('Update User - API Payload:', apiPayload);
 
   const response = await fetch(`${apiUrl}/users/${id}`, {
     method: 'PUT',

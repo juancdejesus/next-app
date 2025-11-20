@@ -59,6 +59,9 @@ export default function UsersPage() {
       RoleId: values.RoleId,
     };
 
+    console.log('Form values:', values);
+    console.log('Payload:', payload);
+
     if (editingUser) {
       await updateUser(editingUser.Id, payload);
     } else {

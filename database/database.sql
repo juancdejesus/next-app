@@ -109,21 +109,29 @@ CREATE TABLE [dbo].[User] (
 GO
 
 -- Insert initial users
-DECLARE @AdminRoleId BIGINT, @UserRoleId BIGINT;
+DECLARE @AdminRoleId BIGINT, @UserRoleId BIGINT, @ViewerRoleId INT, @ManagerRoleId INT;
+
 SELECT @AdminRoleId = Id FROM [UserRoles] WHERE RoleName = 'Admin';
 SELECT @UserRoleId = Id FROM [UserRoles] WHERE RoleName = 'User';
+SELECT @ManagerRoleId = Id FROM [UserRoles] WHERE RoleName = 'Manager';
+SELECT @ViewerRoleId = Id FROM [UserRoles] WHERE RoleName = 'Viewer';
+
 
 INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
-VALUES ('Admin', 'admin', 'admin@example.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @AdminRoleId);
+VALUES ('Juan De Jesus', 'MATRIX\jdejesus', 'jdejesus@test.com', 'https://randomuser.me/api/portraits/men/80.jpg', 'A', @AdminRoleId);
+
 
 INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
-VALUES ('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @AdminRoleId);
+VALUES ('Jose Perez', 'MATRIX\jperez', 'jperez@test.com', 'https://randomuser.me/api/portraits/men/81.jpg', 'A', @AdminRoleId);
 
 INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
-VALUES ('Monitor User', 'monitor', 'monitor@example.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @UserRoleId);
+VALUES ('Jose Ramirez', 'MATRIX\jramirez', 'jramirez@test.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @UserRoleId);
 
 INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
-VALUES ('Pedro Martinez', 'pedro', 'pedro@example.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @UserRoleId);
+VALUES ('Josue Castellanos', 'MATRIX\jcastellanos', 'jcastellanos@example.com', 'https://randomuser.me/api/portraits/men/75.jpg', 'A', @ViewerRoleId);
+
+INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
+VALUES ('Pedro Martinez', 'MATRIX\pmartinez', 'pedro@example.com', 'https://randomuser.me/api/portraits/men/79.jpg', 'A', @ManagerRoleId);
 GO
 
 -- ==============================================================

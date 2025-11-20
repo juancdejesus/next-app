@@ -114,7 +114,8 @@
       "closeDate": "Fecha de Cierre",
       "cancel": "Cancelar",
       "create": "Crear",
-      "update": "Actualizar"
+      "update": "Actualizar",
+      "photoURL": "URL de la Foto"
     }
   }
 }

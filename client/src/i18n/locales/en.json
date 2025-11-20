@@ -114,7 +114,8 @@
       "closeDate": "Close Date",
       "cancel": "Cancel",
       "create": "Create",
-      "update": "Update"
+      "update": "Update",
+      "photoURL": "Photo URL"
     }
   }
 }

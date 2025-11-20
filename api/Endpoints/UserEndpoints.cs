@@ -49,13 +49,14 @@ namespace App.Server.Endpoints
 
                 // Fallback: Return server process user if no Windows Authentication
                 var windowsUsername = Environment.UserName;
-                var domainUsername = Environment.UserDomainName;
+                var domainName = Environment.UserDomainName;
+
 
                 return Results.Ok(new
                 {
                     Username = windowsUsername,
-                    Domain = domainUsername,
-                    FullName = $"{domainUsername}\\{windowsUsername}",
+                    Domain = domainName,
+                    DomainUsername = $"{domainName}\\{windowsUsername}",
                     IsAuthenticated = false,
                     AuthenticationType = "ServerProcess",
                     Note = "Windows Authentication not detected. Run with IIS Express and ensure windowsAuthentication=true in launchSettings.json"
@@ -108,11 +109,11 @@ namespace App.Server.Endpoints
 
                 var parameters = new
                 {
-                    Name = user.name,
-                    Username = user.username,
-                    Email = user.email,
-                    PhotoURL = user.photo_url,
-                    RoleId = user.role_id
+                    Name = user.Name,
+                    Username = user.Username,
+                    Email = user.Email,
+                    PhotoURL = user.PhotoURL,
+                    RoleId = user.RoleId
                 };
 
                 var newUser = await connection.QueryFirstOrDefaultAsync<dynamic>(
@@ -126,7 +127,7 @@ namespace App.Server.Endpoints
                     return Results.NotFound(new { Message = $"Couldn't get the new created user." });
                 }
 
-                return Results.Created($"{BaseRoute}/{newUser.id}", newUser);
+                return Results.Created($"{BaseRoute}/{newUser.Id}", newUser);
             });
 
             app.MapPut($"{BaseRoute}/{{id:int}}", async (int id, User user, DapperContext context) =>
@@ -136,12 +137,12 @@ namespace App.Server.Endpoints
                 var parameters = new
                 {
                     Id = id,
-                    Name = user.name,
-                    Username = user.username,
-                    Email = user.email,
-                    PhotoURL = user.photo_url,
-                    UserStatus = user.user_status,
-                    RoleId = user.role_id
+                    Name = user.Name,
+                    Username = user.Username,
+                    Email = user.Email,
+                    PhotoURL = user.PhotoURL,
+                    UserStatus = user.UserStatus,
+                    RoleId = user.RoleId
                 };
 
                 var rowsAffected = await connection.ExecuteAsync(

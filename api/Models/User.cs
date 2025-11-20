@@ -4,14 +4,14 @@ namespace App.Server.Models
 {
     public class User
     {
-        public long id { get; set; }
-        public string? name { get; set; }
-        public string? username { get; set; }
-        public string? email { get; set; }
-        public string? photo_url { get; set; }
-        public string? user_status { get; set; }
-        public DateTime? last_active_time { get; set; }
-        public long? role_id { get; set; }
-        public string? role { get; set; }  // RoleName from JOIN
+        public long Id { get; set; }
+        public string? Name { get; set; }
+        public string? Username { get; set; }
+        public string? Email { get; set; }
+        public string? PhotoURL { get; set; }
+        public string? UserStatus { get; set; }
+        public DateTime? LastActiveTime { get; set; }
+        public long? RoleId { get; set; }
+        public string? Role { get; set; }  // RoleName from JOIN
     }
 }
