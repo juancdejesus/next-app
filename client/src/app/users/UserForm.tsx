@@ -1,9 +1,13 @@
-import { Modal, Form, Input, Select, Button, Row, Col } from 'antd';
-import { UserOutlined, MailOutlined, SolutionOutlined, PictureOutlined } from '@ant-design/icons';
+import { Modal, Form, Select, Button, Row, Col, Card, Avatar, Typography, Space } from 'antd';
+import { UserOutlined, SolutionOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import type { User, UserFormValues, UserRole } from '@/services/userService';
+import type { Employee } from '@/services/employeeService';
 import { fetchRoles } from '@/services/userService';
+import { fetchEmployeesWithoutAccess } from '@/services/employeeService';
+
+const { Text } = Typography;
 
 interface UserFormProps {
   open: boolean;
@@ -16,51 +20,68 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const [roles, setRoles] = useState<UserRole[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(false);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
-  // Fetch roles when component mounts
+  // Fetch roles and employees when component mounts (only for new users)
   useEffect(() => {
-    const loadRoles = async () => {
+    const loadData = async () => {
       try {
         setLoadingRoles(true);
-        const rolesData = await fetchRoles();
+        setLoadingEmployees(true);
+
+        const [rolesData, employeesData] = await Promise.all([
+          fetchRoles(),
+          editingUser ? Promise.resolve([]) : fetchEmployeesWithoutAccess(),
+        ]);
+
         setRoles(rolesData);
+        setEmployees(employeesData);
       } catch (error) {
-        console.error('Error fetching roles:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoadingRoles(false);
+        setLoadingEmployees(false);
       }
     };
 
-    loadRoles();
-  }, []);
+    if (open) {
+      loadData();
+    }
+  }, [open, editingUser]);
 
   // Update form fields when editingUser changes or modal opens
   useEffect(() => {
     if (open) {
       if (editingUser) {
         form.setFieldsValue({
-          Name: editingUser.Name,
-          Username: editingUser.Username,
-          Email: editingUser.Email,
-          PhotoURL: editingUser.PhotoURL,
-          UserStatus: editingUser.UserStatus,
           RoleId: editingUser.RoleId,
+          UserStatus: editingUser.UserStatus,
         });
       } else {
         form.resetFields();
+        setSelectedEmployee(null);
       }
     }
   }, [open, editingUser, form]);
 
+  const handleEmployeeChange = (employeeId: number) => {
+    const employee = employees.find((e) => e.Id === employeeId);
+    setSelectedEmployee(employee || null);
+  };
+
   const handleCancel = () => {
     form.resetFields();
+    setSelectedEmployee(null);
     onCancel();
   };
 
   const handleSubmit = async (values: UserFormValues) => {
     await onSubmit(values);
     form.resetFields();
+    setSelectedEmployee(null);
   };
 
   // Set default values for new users
@@ -82,47 +103,91 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
         initialValues={initialValues}
         className="user-form"
       >
-        <Row gutter={24}>
-          <Col span={12}>
+        {/* Employee Selection (only for new users) */}
+        {!editingUser && (
+          <>
             <Form.Item
-              label={t('users.modal.name')}
-              name="Name"
-              rules={[{ required: true, message: t('users.modal.nameRequired') }]}
+              label="Select Employee"
+              name="EmployeeId"
+              rules={[{ required: true, message: 'Please select an employee' }]}
             >
-              <Input prefix={<UserOutlined />} />
+              <Select
+                showSearch
+                loading={loadingEmployees}
+                placeholder="Search and select an employee..."
+                onChange={handleEmployeeChange}
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                options={employees.map((emp) => ({
+                  value: emp.Id,
+                  label: `${emp.FullName} (${emp.Email})`,
+                  employee: emp,
+                }))}
+              />
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label={t('users.modal.username')}
-              name="Username"
-              rules={[{ required: true, message: t('users.modal.usernameRequired') }]}
-            >
-              <Input prefix={<UserOutlined />} disabled={!!editingUser} />
-            </Form.Item>
-          </Col>
-        </Row>
 
-        <Row gutter={24}>
-          <Col span={12}>
-            <Form.Item
-              label={t('users.modal.email')}
-              name="Email"
-              rules={[
-                { required: true, message: t('users.modal.emailRequired') },
-                { type: 'email', message: t('users.modal.emailInvalid') },
-              ]}
-            >
-              <Input prefix={<MailOutlined />} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label={t('users.modal.photoURL')} name="PhotoURL">
-              <Input prefix={<PictureOutlined />} placeholder="https://example.com/photo.jpg" />
-            </Form.Item>
-          </Col>
-        </Row>
+            {/* Employee Preview Card */}
+            {selectedEmployee && (
+              <Card style={{ marginBottom: 24, backgroundColor: '#fafafa' }}>
+                <Space size="middle">
+                  <Avatar size={64} src={selectedEmployee.PhotoURL} icon={<UserOutlined />}>
+                    {selectedEmployee.FirstName?.[0]}{selectedEmployee.LastName?.[0]}
+                  </Avatar>
+                  <div>
+                    <Text strong style={{ fontSize: 16, display: 'block' }}>
+                      {selectedEmployee.FullName}
+                    </Text>
+                    <Text type="secondary" style={{ display: 'block' }}>
+                      {selectedEmployee.Email}
+                    </Text>
+                    {selectedEmployee.Department && selectedEmployee.JobTitle && (
+                      <Text type="secondary" style={{ display: 'block' }}>
+                        {selectedEmployee.Department} - {selectedEmployee.JobTitle}
+                      </Text>
+                    )}
+                    {selectedEmployee.DomainUsername && (
+                      <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>
+                        {selectedEmployee.DomainUsername}
+                      </Text>
+                    )}
+                  </div>
+                </Space>
+              </Card>
+            )}
+          </>
+        )}
 
+        {/* Employee Info (read-only for editing) */}
+        {editingUser && (
+          <Card style={{ marginBottom: 24, backgroundColor: '#f5f5f5' }}>
+            <Space size="middle">
+              <Avatar size={64} src={editingUser.PhotoURL} icon={<UserOutlined />}>
+                {editingUser.FirstName?.[0]}{editingUser.LastName?.[0]}
+              </Avatar>
+              <div>
+                <Text strong style={{ fontSize: 16, display: 'block' }}>
+                  {editingUser.Name}
+                </Text>
+                <Text type="secondary" style={{ display: 'block' }}>
+                  {editingUser.Email}
+                </Text>
+                {editingUser.Department && editingUser.JobTitle && (
+                  <Text type="secondary" style={{ display: 'block' }}>
+                    {editingUser.Department} - {editingUser.JobTitle}
+                  </Text>
+                )}
+                {editingUser.Username && (
+                  <Text type="secondary" style={{ display: 'block', fontSize: 12 }}>
+                    {editingUser.Username}
+                  </Text>
+                )}
+              </div>
+            </Space>
+          </Card>
+        )}
+
+        {/* Role and Status */}
         <Row gutter={24}>
           <Col span={12}>
             <Form.Item

@@ -110,25 +110,31 @@ namespace App.Server.Endpoints
 
                 var parameters = new
                 {
-                    Name = user.Name,
-                    Username = user.Username,
-                    Email = user.Email,
-                    PhotoURL = user.PhotoURL,
-                    RoleId = user.RoleId
+                    EmployeeId = user.EmployeeId,
+                    RoleId = user.RoleId,
+                    CreatedBy = (long?)null  // TODO: Get from authenticated user context
                 };
 
-                var newUser = await connection.QueryFirstOrDefaultAsync<dynamic>(
-                    "User_Add",
-                    parameters,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                if (newUser == null)
+                try
                 {
-                    return Results.NotFound(new { Message = $"Couldn't get the new created user." });
-                }
+                    var newUser = await connection.QueryFirstOrDefaultAsync<dynamic>(
+                        "User_Add",
+                        parameters,
+                        commandType: CommandType.StoredProcedure
+                    );
 
-                return Results.Created($"{BaseRoute}/{newUser.Id}", newUser);
+                    if (newUser == null)
+                    {
+                        return Results.BadRequest(new { Message = "Couldn't create user account." });
+                    }
+
+                    return Results.Created($"{BaseRoute}/{newUser.Id}", newUser);
+                }
+                catch (Exception ex)
+                {
+                    // Handle SQL errors (e.g., duplicate user, employee not found)
+                    return Results.BadRequest(new { Message = ex.Message });
+                }
             });
 
             app.MapPut($"{BaseRoute}/{{id:int}}", async (int id, User user, DapperContext context) =>
@@ -138,12 +144,9 @@ namespace App.Server.Endpoints
                 var parameters = new
                 {
                     Id = id,
-                    Name = user.Name,
-                    Username = user.Username,
-                    Email = user.Email,
-                    PhotoURL = user.PhotoURL,
+                    RoleId = user.RoleId,
                     UserStatus = user.UserStatus,
-                    RoleId = user.RoleId
+                    ModifiedBy = (long?)null  // TODO: Get from authenticated user context
                 };
 
                 var rowsAffected = await connection.ExecuteAsync(

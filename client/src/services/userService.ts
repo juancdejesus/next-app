@@ -1,32 +1,35 @@
 export interface User {
   Id: number;
-  Name: string;
-  Username: string;
-  Email: string;
-  PhotoURL?: string;
+  EmployeeId: number;
+  RoleId?: number;
   UserStatus: string;
   LastActiveTime: Date | null;
-  RoleId?: number;
+  LastLoginTime?: Date | null;
+  AccountCreatedDate?: Date;
+  // Employee fields (from JOIN)
+  EmployeeNumber: string;
+  FirstName: string;
+  LastName: string;
+  Name: string;  // FullName from Employee
+  Username: string;  // DomainUsername from Employee
+  Email: string;
+  PhotoURL?: string;
+  Department?: string;
+  JobTitle?: string;
+  // Role (from JOIN)
   Role?: string;
 }
 
 export interface UserFormValues {
-  Name: string;
-  Username: string;
-  Email: string;
-  PhotoURL?: string;
-  UserStatus: string;
+  EmployeeId: number;
   RoleId?: number;
+  UserStatus: string;
 }
 
 export interface CreateUserPayload {
-  Id: number;
-  Name: string;
-  Username: string;
-  Email: string;
-  PhotoURL?: string;
-  UserStatus: string;
+  EmployeeId: number;
   RoleId?: number;
+  UserStatus: string;
 }
 
 export interface UserRole {
@@ -78,15 +81,10 @@ export const fetchUsers = async (): Promise<User[]> => {
 export const createUser = async (payload: CreateUserPayload): Promise<void> => {
   const apiUrl = getApiUrl();
 
-  // Send PascalCase to API (now that backend uses PascalCase)
   const apiPayload = {
-    Id: payload.Id,
-    Name: payload.Name,
-    Username: payload.Username,
-    Email: payload.Email,
-    PhotoURL: payload.PhotoURL && payload.PhotoURL.trim() !== '' ? payload.PhotoURL : null,
-    UserStatus: payload.UserStatus,
+    EmployeeId: payload.EmployeeId,
     RoleId: payload.RoleId,
+    UserStatus: payload.UserStatus,
   };
 
   const response = await fetch(`${apiUrl}/users`, {
@@ -98,7 +96,8 @@ export const createUser = async (payload: CreateUserPayload): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to create user');
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.Message || 'Failed to create user');
   }
 };
 
@@ -108,15 +107,9 @@ export const createUser = async (payload: CreateUserPayload): Promise<void> => {
 export const updateUser = async (id: number, payload: CreateUserPayload): Promise<void> => {
   const apiUrl = getApiUrl();
 
-  // Send PascalCase to API (now that backend uses PascalCase)
   const apiPayload = {
-    Id: payload.Id,
-    Name: payload.Name,
-    Username: payload.Username,
-    Email: payload.Email,
-    PhotoURL: payload.PhotoURL && payload.PhotoURL.trim() !== '' ? payload.PhotoURL : null,
-    UserStatus: payload.UserStatus,
     RoleId: payload.RoleId,
+    UserStatus: payload.UserStatus,
   };
 
   console.log('Update User - API Payload:', apiPayload);
