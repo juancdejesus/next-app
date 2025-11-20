@@ -22,6 +22,7 @@ import type { MenuProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import ThemeToggle from './ThemeToggle';
 import { useTheme } from '@/context/ThemeContext';
+import { useUser } from '@/context/UserContext';
 import '../i18n/config';
 
 const { Header, Sider, Content } = Layout;
@@ -69,6 +70,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { siderColor } = useTheme();
+  const { currentUser, loading: userLoading } = useUser();
   const {
     token: { colorBgContainer, colorBgLayout, borderRadiusLG },
   } = theme.useToken();
@@ -314,11 +316,36 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <QuestionCircleOutlined style={{ fontSize: 20, cursor: 'pointer' }} />
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
-                <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{t('user.name')}</div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>{t('user.role')}</div>
-                </div>
-                <Avatar src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyvO8dEbiL0_-6snr-tnpdQwsVDCKfE3lcZyKUY7gqAl9BhWk5iLFI9pXlqDlgWkhmC1OZoemI30jKyxfQw2xCgj768N1mQRxZUIkAqG6imhRVHvxuxu93TMTlb3TUzrZRacK-vmGdhv55KkHbJDvfemwPnuUalnesul0bo1J5dQMe0Mkq2SGQ9axisPUAvv__yyq44XrOXcpNtlI02ESjWzpmSpnutgTIAOeLaNuWIXOVozCXNfmNdcCztB3NmpQsXeoB2FYiKcru" />
+                {!userLoading && currentUser && (
+                  <>
+                    <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{currentUser.Name || t('user.name')}</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>{currentUser.Role || t('user.role')}</div>
+                    </div>
+                    <Avatar
+                      src={currentUser.PhotoURL}
+                      icon={!currentUser.PhotoURL && <UserOutlined />}
+                    />
+                  </>
+                )}
+                {!userLoading && !currentUser && (
+                  <>
+                    <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{t('user.name')}</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>{t('user.role')}</div>
+                    </div>
+                    <Avatar icon={<UserOutlined />} />
+                  </>
+                )}
+                {userLoading && (
+                  <>
+                    <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>...</div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>...</div>
+                    </div>
+                    <Avatar icon={<UserOutlined />} />
+                  </>
+                )}
               </div>
             </Dropdown>
           </div>

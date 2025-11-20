@@ -45,6 +45,10 @@ IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_A
     DROP PROCEDURE [dbo].[User_Add];
 GO
 
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_GetByDomainUsername]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_GetByDomainUsername];
+GO
+
 IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_GetByUsernameOrEmail]') AND type in (N'P', N'PC'))
     DROP PROCEDURE [dbo].[User_GetByUsernameOrEmail];
 GO
@@ -118,7 +122,7 @@ SELECT @ViewerRoleId = Id FROM [UserRoles] WHERE RoleName = 'Viewer';
 
 
 INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
-VALUES ('Juan De Jesus', 'MATRIX\jdejesus', 'jdejesus@test.com', 'https://randomuser.me/api/portraits/men/80.jpg', 'A', @AdminRoleId);
+VALUES ('Juan De Jesus', 'MATRIX\juanc', 'juanc@test.com', 'https://randomuser.me/api/portraits/men/80.jpg', 'A', @AdminRoleId);
 
 
 INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
@@ -206,11 +210,33 @@ CREATE PROCEDURE [dbo].[User_GetByUsernameOrEmail]
 AS
 BEGIN
     SET NOCOUNT ON;
-    
+
     SELECT
         u.Id, u.Name, u.Username, u.Email, u.PhotoURL, u.UserStatus
     FROM [User] u
     WHERE u.Username = @UsernameOrEmail OR u.Email = @UsernameOrEmail;
+END
+GO
+
+-- --------------------------------------------------------------
+-- Procedure: User_GetByDomainUsername
+-- --------------------------------------------------------------
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[User_GetByDomainUsername]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE [dbo].[User_GetByDomainUsername];
+GO
+
+CREATE PROCEDURE [dbo].[User_GetByDomainUsername]
+    @DomainUsername NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        u.Id, u.Name, u.Username, u.Email, u.PhotoURL, u.UserStatus, u.LastActiveTime,
+        u.RoleId, r.RoleName AS Role
+    FROM [User] u
+    LEFT JOIN [UserRoles] r ON u.RoleId = r.Id
+    WHERE u.Username = @DomainUsername;
 END
 GO
 

@@ -22,45 +22,46 @@ namespace App.Server.Endpoints
         public void MapEndpoints(IEndpointRouteBuilder app)
         {
             // Get current Windows authenticated user from browser
-            app.MapGet($"{BaseRoute}/me", (HttpContext httpContext) =>
+            app.MapGet($"{BaseRoute}/me", async (HttpContext httpContext, DapperContext context) =>
             {
                 var user = httpContext.User;
                 var identity = user?.Identity;
 
+                string domainUsername;
+
                 // Check if user is authenticated via Windows Authentication
                 if (identity?.IsAuthenticated == true && !string.IsNullOrEmpty(identity.Name))
                 {
-                    var username = identity.Name;
+                    domainUsername = identity.Name;
+                }
+                else
+                {
+                    // Fallback: Return server process user if no Windows Authentication
+                    var windowsUsername = Environment.UserName;
+                    var domainName = Environment.UserDomainName;
+                    domainUsername = domainName + "\\" + windowsUsername;
+                }
 
-                    // Parse domain\username format
-                    var parts = username.Split('\\');
-                    var domain = parts.Length > 1 ? parts[0] : string.Empty;
-                    var userName = parts.Length > 1 ? parts[1] : parts[0];
+                // Query the database for the user by domain username
+                using var connection = context.CreateConnection();
+                var parameters = new { DomainUsername = domainUsername };
 
-                    return Results.Ok(new
+                var dbUser = await connection.QueryFirstOrDefaultAsync<dynamic>(
+                    "User_GetByDomainUsername",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (dbUser == null)
+                {
+                    return Results.NotFound(new
                     {
-                        Username = userName,
-                        Domain = domain,
-                        FullName = username,
-                        IsAuthenticated = true,
-                        identity.AuthenticationType
+                        Message = $"User with domain username '{domainUsername}' not found in database.",
+                        DomainUsername = domainUsername
                     });
                 }
 
-                // Fallback: Return server process user if no Windows Authentication
-                var windowsUsername = Environment.UserName;
-                var domainName = Environment.UserDomainName;
-
-
-                return Results.Ok(new
-                {
-                    Username = windowsUsername,
-                    Domain = domainName,
-                    DomainUsername = $"{domainName}\\{windowsUsername}",
-                    IsAuthenticated = false,
-                    AuthenticationType = "ServerProcess",
-                    Note = "Windows Authentication not detected. Run with IIS Express and ensure windowsAuthentication=true in launchSettings.json"
-                });
+                return Results.Ok(dbUser);
             });
 
             // Get user list

@@ -45,6 +45,20 @@ const getApiUrl = (): string => {
 };
 
 /**
+ * Fetches the current authenticated user from the API
+ */
+export const getCurrentUser = async (): Promise<User> => {
+  const apiUrl = getApiUrl();
+  const response = await fetch(`${apiUrl}/users/me`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch current user');
+  }
+
+  return response.json();
+};
+
+/**
  * Fetches all users from the API
  */
 export const fetchUsers = async (): Promise<User[]> => {
