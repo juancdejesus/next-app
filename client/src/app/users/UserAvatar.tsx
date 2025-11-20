@@ -3,10 +3,17 @@ import { getAvatarColor, getNameInitial } from '@/utils/userUtils';
 
 interface UserAvatarProps {
   name: string;
+  photoURL?: string;
   size?: number;
 }
 
-export const UserAvatar = ({ name, size = 36 }: UserAvatarProps) => {
+export const UserAvatar = ({ name, photoURL, size = 36 }: UserAvatarProps) => {
+  // If photoURL is provided and not empty, use it as the avatar image
+  if (photoURL && photoURL.trim() !== '') {
+    return <Avatar size={size} src={photoURL} style={{ flexShrink: 0 }} />;
+  }
+
+  // Otherwise, use the default colored avatar with initials
   return (
     <Avatar
       size={size}

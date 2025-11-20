@@ -33,7 +33,7 @@ export const UserTable = ({ users, loading, onEdit, onDelete, onInactivate }: Us
       }),
       render: (_: unknown, record: User) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <UserAvatar name={record.Name} />
+          <UserAvatar name={record.Name} photoURL={record.PhotoURL} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontWeight: 500, fontSize: '14px', color: colorText }}>
               {record.Name}

@@ -100,6 +100,7 @@ CREATE TABLE [dbo].[User] (
     Name NVARCHAR(200) NULL,
     Username NVARCHAR(50) NOT NULL UNIQUE,
     Email NVARCHAR(100) NOT NULL UNIQUE,
+    PhotoURL NVARCHAR(500) NULL,
     UserStatus NVARCHAR(10) NULL,
     LastActiveTime DATETIME2 NULL DEFAULT GETDATE(),
     RoleId BIGINT NULL,
@@ -112,17 +113,17 @@ DECLARE @AdminRoleId BIGINT, @UserRoleId BIGINT;
 SELECT @AdminRoleId = Id FROM [UserRoles] WHERE RoleName = 'Admin';
 SELECT @UserRoleId = Id FROM [UserRoles] WHERE RoleName = 'User';
 
-INSERT INTO [User] (Name, Username, Email, UserStatus, RoleId)
-VALUES ('Admin', 'admin', 'admin@example.com', 'A', @AdminRoleId);
+INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
+VALUES ('Admin', 'admin', 'admin@example.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @AdminRoleId);
 
-INSERT INTO [User] (Name, Username, Email, UserStatus, RoleId)
-VALUES ('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', 'A', @AdminRoleId);
+INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
+VALUES ('Juan De Jesus', 'juan', 'juancdejesus@hotmail.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @AdminRoleId);
 
-INSERT INTO [User] (Name, Username, Email, UserStatus, RoleId)
-VALUES ('Monitor User', 'monitor', 'monitor@example.com', 'A', @UserRoleId);
+INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
+VALUES ('Monitor User', 'monitor', 'monitor@example.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @UserRoleId);
 
-INSERT INTO [User] (Name, Username, Email, UserStatus, RoleId)
-VALUES ('Pedro Martinez', 'pedro', 'pedro@example.com', 'A', @UserRoleId);
+INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
+VALUES ('Pedro Martinez', 'pedro', 'pedro@example.com', 'https://randomuser.me/api/portraits/men/74.jpg', 'A', @UserRoleId);
 GO
 
 -- ==============================================================
@@ -155,7 +156,7 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
-        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.LastActiveTime,
+        u.Id, u.Name, u.Username, u.Email, u.PhotoURL, u.UserStatus, u.LastActiveTime,
         u.RoleId, r.RoleName AS Role
     FROM [User] u
     LEFT JOIN [UserRoles] r ON u.RoleId = r.Id
@@ -177,7 +178,7 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
-        u.Id, u.Name, u.Username, u.Email, u.UserStatus, u.LastActiveTime,
+        u.Id, u.Name, u.Username, u.Email, u.PhotoURL, u.UserStatus, u.LastActiveTime,
         u.RoleId, r.RoleName AS Role
     FROM [User] u
     LEFT JOIN [UserRoles] r ON u.RoleId = r.Id
@@ -199,7 +200,7 @@ BEGIN
     SET NOCOUNT ON;
     
     SELECT
-        u.Id, u.Name, u.Username, u.Email, u.UserStatus
+        u.Id, u.Name, u.Username, u.Email, u.PhotoURL, u.UserStatus
     FROM [User] u
     WHERE u.Username = @UsernameOrEmail OR u.Email = @UsernameOrEmail;
 END
@@ -216,6 +217,7 @@ CREATE PROCEDURE [dbo].[User_Add]
     @Name NVARCHAR(200),
     @Username NVARCHAR(50),
     @Email NVARCHAR(100),
+    @PhotoURL NVARCHAR(500) = NULL,
     @RoleId BIGINT = NULL
 AS
 BEGIN
@@ -227,8 +229,8 @@ BEGIN
         SELECT @RoleId = Id FROM [UserRoles] WHERE RoleName = 'User';
     END
 
-    INSERT INTO [User] (Name, Username, Email, UserStatus, RoleId)
-    VALUES (@Name, @Username, @Email, 'A', @RoleId);
+    INSERT INTO [User] (Name, Username, Email, PhotoURL, UserStatus, RoleId)
+    VALUES (@Name, @Username, @Email, @PhotoURL, 'A', @RoleId);
 
     SELECT SCOPE_IDENTITY() AS Id;
 END
@@ -282,6 +284,7 @@ CREATE PROCEDURE [dbo].[User_Update]
     @Name NVARCHAR(200),
     @Username NVARCHAR(50),
     @Email NVARCHAR(100),
+    @PhotoURL NVARCHAR(500) = NULL,
     @UserStatus NVARCHAR(10),
     @RoleId BIGINT = NULL
 AS
@@ -292,6 +295,7 @@ BEGIN
     SET Name = @Name,
         Username = @Username,
         Email = @Email,
+        PhotoURL = @PhotoURL,
         UserStatus = @UserStatus,
         RoleId = ISNULL(@RoleId, RoleId)  -- Only update if provided
     WHERE Id = @Id;

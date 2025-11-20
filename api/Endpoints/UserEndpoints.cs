@@ -111,6 +111,7 @@ namespace App.Server.Endpoints
                     Name = user.name,
                     Username = user.username,
                     Email = user.email,
+                    PhotoURL = user.photo_url,
                     RoleId = user.role_id
                 };
 
@@ -138,6 +139,7 @@ namespace App.Server.Endpoints
                     Name = user.name,
                     Username = user.username,
                     Email = user.email,
+                    PhotoURL = user.photo_url,
                     UserStatus = user.user_status,
                     RoleId = user.role_id
                 };

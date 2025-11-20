@@ -1,5 +1,5 @@
 import { Modal, Form, Input, Select, Button, Row, Col } from 'antd';
-import { UserOutlined, MailOutlined, SolutionOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, SolutionOutlined, PictureOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import type { User, UserFormValues, UserRole } from '@/services/userService';
@@ -40,11 +40,12 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
     if (open) {
       if (editingUser) {
         form.setFieldsValue({
-          name: editingUser.Name,
-          username: editingUser.Username,
-          email: editingUser.Email,
-          user_status: editingUser.UserStatus,
-          role_id: editingUser.RoleId,
+          Name: editingUser.Name,
+          Username: editingUser.Username,
+          Email: editingUser.Email,
+          PhotoURL: editingUser.PhotoURL,
+          UserStatus: editingUser.UserStatus,
+          RoleId: editingUser.RoleId,
         });
       } else {
         form.resetFields();
@@ -63,7 +64,7 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
   };
 
   // Set default values for new users
-  const initialValues = { user_status: 'A' };
+  const initialValues = { UserStatus: 'A' };
 
   return (
     <Modal
@@ -85,7 +86,7 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
           <Col span={12}>
             <Form.Item
               label={t('users.modal.name')}
-              name="name"
+              name="Name"
               rules={[{ required: true, message: t('users.modal.nameRequired') }]}
             >
               <Input prefix={<UserOutlined />} />
@@ -94,7 +95,7 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
           <Col span={12}>
             <Form.Item
               label={t('users.modal.username')}
-              name="username"
+              name="Username"
               rules={[{ required: true, message: t('users.modal.usernameRequired') }]}
             >
               <Input prefix={<UserOutlined />} disabled={!!editingUser} />
@@ -106,7 +107,7 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
           <Col span={12}>
             <Form.Item
               label={t('users.modal.email')}
-              name="email"
+              name="Email"
               rules={[
                 { required: true, message: t('users.modal.emailRequired') },
                 { type: 'email', message: t('users.modal.emailInvalid') },
@@ -115,13 +116,18 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
               <Input prefix={<MailOutlined />} />
             </Form.Item>
           </Col>
+          <Col span={12}>
+            <Form.Item label={t('users.modal.photoURL')} name="PhotoURL">
+              <Input prefix={<PictureOutlined />} placeholder="https://example.com/photo.jpg" />
+            </Form.Item>
+          </Col>
         </Row>
 
         <Row gutter={24}>
           <Col span={12}>
             <Form.Item
               label={t('users.modal.role')}
-              name="role_id"
+              name="RoleId"
               rules={[{ required: true, message: t('users.modal.roleRequired') }]}
             >
               <Select
@@ -140,7 +146,7 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
           <Col span={12}>
             <Form.Item
               label={t('users.modal.status')}
-              name="user_status"
+              name="UserStatus"
               rules={[{ required: true, message: t('users.modal.statusRequired') }]}
             >
               <Select>

@@ -3,6 +3,7 @@ export interface User {
   Name: string;
   Username: string;
   Email: string;
+  PhotoURL?: string;
   UserStatus: string;
   LastActiveTime: Date | null;
   RoleId?: number;
@@ -10,20 +11,22 @@ export interface User {
 }
 
 export interface UserFormValues {
-  name: string;
-  username: string;
-  email: string;
-  user_status: string;
-  role_id?: number;
+  Name: string;
+  Username: string;
+  Email: string;
+  PhotoURL?: string;
+  UserStatus: string;
+  RoleId?: number;
 }
 
 export interface CreateUserPayload {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  user_status: string;
-  role_id?: number;
+  Id: number;
+  Name: string;
+  Username: string;
+  Email: string;
+  PhotoURL?: string;
+  UserStatus: string;
+  RoleId?: number;
 }
 
 export interface UserRole {
@@ -60,12 +63,24 @@ export const fetchUsers = async (): Promise<User[]> => {
  */
 export const createUser = async (payload: CreateUserPayload): Promise<void> => {
   const apiUrl = getApiUrl();
+
+  // Convert PascalCase to snake_case for API
+  const apiPayload = {
+    id: payload.Id,
+    name: payload.Name,
+    username: payload.Username,
+    email: payload.Email,
+    photo_url: payload.PhotoURL,
+    user_status: payload.UserStatus,
+    role_id: payload.RoleId,
+  };
+
   const response = await fetch(`${apiUrl}/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(apiPayload),
   });
 
   if (!response.ok) {
@@ -78,12 +93,24 @@ export const createUser = async (payload: CreateUserPayload): Promise<void> => {
  */
 export const updateUser = async (id: number, payload: CreateUserPayload): Promise<void> => {
   const apiUrl = getApiUrl();
+
+  // Convert PascalCase to snake_case for API
+  const apiPayload = {
+    id: payload.Id,
+    name: payload.Name,
+    username: payload.Username,
+    email: payload.Email,
+    photo_url: payload.PhotoURL,
+    user_status: payload.UserStatus,
+    role_id: payload.RoleId,
+  };
+
   const response = await fetch(`${apiUrl}/users/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(apiPayload),
   });
 
   if (!response.ok) {
