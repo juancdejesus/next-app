@@ -31,43 +31,6 @@ export const apiConfig = {
   basePath: '/monitor',
 
   /**
-   * API endpoints
-   * Relative paths to be appended to baseUrl
-   */
-  endpoints: {
-    // User endpoints
-    users: {
-      list: '/users',
-      getById: (id: string | number) => `/users/${id}`,
-      create: '/users',
-      update: (id: string | number) => `/users/${id}`,
-      delete: (id: string | number) => `/users/${id}`,
-      me: '/users/me',
-    },
-
-    // Employee endpoints
-    employees: {
-      list: '/employees',
-      getById: (id: string | number) => `/employees/${id}`,
-      create: '/employees',
-      update: (id: string | number) => `/employees/${id}`,
-      delete: (id: string | number) => `/employees/${id}`,
-    },
-
-    // Role endpoints
-    roles: {
-      list: '/roles',
-      getById: (id: string | number) => `/roles/${id}`,
-    },
-
-    // Add other endpoint groups as needed
-    // jobs: { ... },
-    // approvals: { ... },
-    // templates: { ... },
-    // items: { ... },
-  },
-
-  /**
    * Request timeout in milliseconds
    */
   timeout: 30000,
@@ -84,16 +47,5 @@ export const apiConfig = {
    */
   withCredentials: true,
 } as const;
-
-/**
- * Build full URL for an endpoint
- */
-export const buildApiUrl = (endpoint: string): string => {
-  const base = apiConfig.baseUrl.endsWith('/')
-    ? apiConfig.baseUrl.slice(0, -1)
-    : apiConfig.baseUrl;
-  const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  return `${base}${path}`;
-};
 
 export type ApiConfig = typeof apiConfig;
