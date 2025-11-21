@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { App, ConfigProvider, theme as antdTheme } from 'antd';
+import { storageKeys } from '@/config/storage.config';
+import { colors as themeColors, themeTokens } from '@/config/theme.config';
 
 type Theme = 'light' | 'dark';
 type DateFormat = 'yyyy-mm-dd' | 'dd/mm/yyyy' | 'mm/dd/yyyy';
@@ -36,15 +38,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('light');
   const [language, setLanguageState] = useState<Language>('en');
   const [dateFormat, setDateFormatState] = useState<DateFormat>('yyyy-mm-dd');
-  const [siderColor, setSiderColorState] = useState<string>('#001529');
+  const [siderColor, setSiderColorState] = useState<string>(themeColors.defaultSider);
   const [mounted, setMounted] = useState(false);
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    const savedLanguage = localStorage.getItem('language') as Language;
-    const savedDateFormat = localStorage.getItem('dateFormat') as DateFormat;
-    const savedSiderColor = localStorage.getItem('siderColor');
+    const savedTheme = localStorage.getItem(storageKeys.THEME) as Theme;
+    const savedLanguage = localStorage.getItem(storageKeys.LANGUAGE) as Language;
+    const savedDateFormat = localStorage.getItem(storageKeys.DATE_FORMAT) as DateFormat;
+    const savedSiderColor = localStorage.getItem(storageKeys.SIDER_COLOR);
 
     if (savedTheme) {
       setTheme(savedTheme);
@@ -72,7 +74,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Save theme to localStorage and update document class
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem('theme', theme);
+      localStorage.setItem(storageKeys.THEME, theme);
       document.documentElement.classList.toggle('dark', theme === 'dark');
     }
   }, [theme, mounted]);
@@ -80,21 +82,21 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Save language to localStorage
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem('language', language);
+      localStorage.setItem(storageKeys.LANGUAGE, language);
     }
   }, [language, mounted]);
 
   // Save date format to localStorage
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem('dateFormat', dateFormat);
+      localStorage.setItem(storageKeys.DATE_FORMAT, dateFormat);
     }
   }, [dateFormat, mounted]);
 
   // Save sider color to localStorage
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem('siderColor', siderColor);
+      localStorage.setItem(storageKeys.SIDER_COLOR, siderColor);
     }
   }, [siderColor, mounted]);
 
@@ -118,8 +120,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const antdThemeConfig = {
     algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
     token: {
-      colorPrimary: '#1677ff',
-      borderRadius: 8,
+      colorPrimary: themeTokens.colorPrimary,
+      borderRadius: themeTokens.borderRadius,
     },
   };
 

@@ -1,5 +1,4 @@
-import { constants } from "buffer";
-import { log } from "console";
+import { apiConfig } from '@/config/api.config';
 
 export interface User {
   Id: number;
@@ -42,20 +41,11 @@ export interface UserRole {
   CreatedDate: Date;
 }
 
-const getApiUrl = (): string => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error('NEXT_PUBLIC_API_URL is not defined');
-  }
-  return apiUrl;
-};
-
 /**
  * Fetches the current authenticated user from the API
  */
 export const getCurrentUser = async (): Promise<User> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/users/me`);
+  const response = await fetch(`${apiConfig.baseUrl}/users/me`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch current user');
@@ -68,8 +58,7 @@ export const getCurrentUser = async (): Promise<User> => {
  * Fetches all users from the API
  */
 export const fetchUsers = async (): Promise<User[]> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/users`);
+  const response = await fetch(`${apiConfig.baseUrl}/users`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch users');
@@ -82,20 +71,18 @@ export const fetchUsers = async (): Promise<User[]> => {
  * Creates a new user
  */
 export const createUser = async (payload: CreateUserPayload): Promise<void> => {
-  const apiUrl = getApiUrl();
-
   const apiPayload = {
     EmployeeId: payload.EmployeeId,
     RoleId: payload.RoleId,
     UserStatus: payload.UserStatus,
   };
-  
+
 
   //console.log('Create User - API Payload:', apiPayload);
-  //console.log('Create User - API URL:', `${apiUrl}/users`);
+  //console.log('Create User - API URL:', `${apiConfig.baseUrl}/users`);
   //console.log('Create User - Original Payload:', payload);
 
-  const response = await fetch(`${apiUrl}/users`, {
+  const response = await fetch(`${apiConfig.baseUrl}/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -113,8 +100,6 @@ export const createUser = async (payload: CreateUserPayload): Promise<void> => {
  * Updates an existing user
  */
 export const updateUser = async (id: number, payload: CreateUserPayload): Promise<void> => {
-  const apiUrl = getApiUrl();
-
   const apiPayload = {
     RoleId: payload.RoleId,
     UserStatus: payload.UserStatus,
@@ -122,7 +107,7 @@ export const updateUser = async (id: number, payload: CreateUserPayload): Promis
 
   console.log('Update User - API Payload:', apiPayload);
 
-  const response = await fetch(`${apiUrl}/users/${id}`, {
+  const response = await fetch(`${apiConfig.baseUrl}/users/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -139,8 +124,7 @@ export const updateUser = async (id: number, payload: CreateUserPayload): Promis
  * Deletes a user by ID
  */
 export const deleteUser = async (id: number): Promise<void> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/users/${id}`, {
+  const response = await fetch(`${apiConfig.baseUrl}/users/${id}`, {
     method: 'DELETE',
   });
 
@@ -153,8 +137,7 @@ export const deleteUser = async (id: number): Promise<void> => {
  * Inactivates a user by ID
  */
 export const inactivateUser = async (id: number): Promise<void> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/users/${id}/inactivate`, {
+  const response = await fetch(`${apiConfig.baseUrl}/users/${id}/inactivate`, {
     method: 'POST',
   });
 
@@ -167,8 +150,7 @@ export const inactivateUser = async (id: number): Promise<void> => {
  * Fetches all available user roles
  */
 export const fetchRoles = async (): Promise<UserRole[]> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/roles`);
+  const response = await fetch(`${apiConfig.baseUrl}/roles`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch roles');

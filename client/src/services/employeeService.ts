@@ -1,6 +1,4 @@
-const getApiUrl = () => {
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/monitor/api';
-};
+import { apiConfig } from '@/config/api.config';
 
 export interface Employee {
   Id: number;
@@ -24,10 +22,9 @@ export interface Employee {
 }
 
 export const fetchEmployees = async (includeTerminated: boolean = false): Promise<Employee[]> => {
-  const apiUrl = getApiUrl();
   const url = includeTerminated
-    ? `${apiUrl}/employees?includeTerminated=true`
-    : `${apiUrl}/employees`;
+    ? `${apiConfig.baseUrl}/employees?includeTerminated=true`
+    : `${apiConfig.baseUrl}/employees`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -37,8 +34,7 @@ export const fetchEmployees = async (includeTerminated: boolean = false): Promis
 };
 
 export const fetchEmployeesWithoutAccess = async (): Promise<Employee[]> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/employees/without-access`);
+  const response = await fetch(`${apiConfig.baseUrl}/employees/without-access`);
   if (!response.ok) {
     throw new Error('Failed to fetch employees without access');
   }
@@ -46,8 +42,7 @@ export const fetchEmployeesWithoutAccess = async (): Promise<Employee[]> => {
 };
 
 export const fetchEmployeeById = async (id: number): Promise<Employee> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/employees/${id}`);
+  const response = await fetch(`${apiConfig.baseUrl}/employees/${id}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch employee with ID ${id}`);
   }
@@ -55,8 +50,7 @@ export const fetchEmployeeById = async (id: number): Promise<Employee> => {
 };
 
 export const createEmployee = async (employee: Partial<Employee>): Promise<void> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/employees`, {
+  const response = await fetch(`${apiConfig.baseUrl}/employees`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(employee),
@@ -68,8 +62,7 @@ export const createEmployee = async (employee: Partial<Employee>): Promise<void>
 };
 
 export const updateEmployee = async (id: number, employee: Partial<Employee>): Promise<void> => {
-  const apiUrl = getApiUrl();
-  const response = await fetch(`${apiUrl}/employees/${id}`, {
+  const response = await fetch(`${apiConfig.baseUrl}/employees/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(employee),

@@ -97,6 +97,15 @@ client/src/
 │       ├── UserForm.tsx
 │       ├── UserToolbar.tsx
 │       └── UserAvatar.tsx
+├── config/                # Centralized configuration
+│   ├── index.ts           # Central export point
+│   ├── app.config.ts      # App name, description, version
+│   ├── routes.config.tsx  # Menu routes with icons
+│   ├── theme.config.ts    # Colors, tokens, sidebar palette
+│   ├── layout.config.ts   # Dimensions, spacing, transitions
+│   ├── api.config.ts      # API base URLs, endpoints
+│   ├── storage.config.ts  # localStorage key constants
+│   └── i18n.config.ts     # Languages, date formats
 ├── context/               # React Context providers
 │   └── ThemeContext.tsx   # Theme, language, date format state
 ├── hooks/                 # Custom React hooks
@@ -108,15 +117,29 @@ client/src/
 └── i18n/                  # Internationalization (English/Spanish)
 ```
 
+**Centralized Configuration** (`client/src/config/`):
+- **All configuration** centralized in `config/` directory for maintainability
+- Import configs via: `import { appConfig, apiConfig, themeConfig } from '@/config'`
+- Key configurations:
+  - `app.config.ts` - App name ("Update Hub"), description, version, metadata
+  - `routes.config.tsx` - Menu routes with icons and i18n keys (mainRoutes, footerRoutes)
+  - `theme.config.ts` - Colors (primary: #1677ff), sidebar palette (12 colors), theme tokens
+  - `layout.config.ts` - Dimensions (sider: 200px, header: 64px, spacing, transitions)
+  - `api.config.ts` - API base URL, endpoint paths, request configuration
+  - `storage.config.ts` - localStorage key constants (THEME, LANGUAGE, SIDER_COLOR, etc.)
+  - `i18n.config.ts` - Supported languages (en, es), date formats, defaults
+- **Always use config constants** instead of hardcoding values
+
 **State Management**:
 - Uses **React Context API** (no Redux/Zustand)
 - `ThemeContext` manages: theme (dark/light), language (en/es), date format, sidebar color
-- All theme settings persisted to **localStorage** to prevent flash on page load
+- All theme settings persisted to **localStorage** using keys from `storage.config.ts`
 - Component-level state uses `useState` for forms, modals, search
 
 **API Communication**:
 - Service layer in `client/src/services/` handles all API calls using `fetch`
-- API base URL configured via `NEXT_PUBLIC_API_URL` environment variable
+- **Always use `apiConfig.baseUrl`** from `config/api.config.ts` for API URLs
+- API base URL configured via `NEXT_PUBLIC_API_URL` environment variable (fallback: localhost:5000)
 - Custom hooks (e.g., `useUsers`) wrap service calls with error handling and Ant Design message notifications
 - Type-safe interfaces defined for all API contracts
 
@@ -135,13 +158,14 @@ client/src/
 
 **Routing & Navigation**:
 - Uses Next.js 16 App Router (file-based routing)
-- Sidebar navigation in `AppLayout.tsx` with route mapping (`routeToKeyMap`, `keyToRouteMap`)
+- **Route configuration** centralized in `config/routes.config.tsx` (mainRoutes, footerRoutes)
+- Sidebar navigation in `AppLayout.tsx` uses routes from config
 - Client-side navigation via `useRouter()` and `usePathname()` from `next/navigation`
 
 **Internationalization**:
 - `i18next` with browser language detection
-- Supports English (`en`) and Spanish (`es`)
-- Configuration in `client/src/i18n/`
+- **Supported languages** defined in `config/i18n.config.ts` (en, es)
+- Translation files in `client/src/i18n/locales/`
 
 ### CORS Configuration
 
@@ -166,10 +190,11 @@ policy.WithOrigins("http://localhost:3000")
 
 1. Create new page directory under `client/src/app/feature-name/`
 2. Add `page.tsx` for the route
-3. Create service functions in `client/src/services/featureService.ts`
+3. Create service functions in `client/src/services/featureService.ts` (use `apiConfig.baseUrl`)
 4. Create custom hooks in `client/src/hooks/useFeature.ts` for state management
 5. Add types/interfaces for API contracts
-6. Update sidebar navigation in `components/AppLayout.tsx`
+6. **Add route to `config/routes.config.tsx`** (mainRoutes or footerRoutes array)
+7. No need to update AppLayout.tsx - routes are auto-loaded from config
 
 ### Database Schema Changes
 
@@ -183,8 +208,15 @@ policy.WithOrigins("http://localhost:3000")
 - **Package Manager**: Use `pnpm` (not npm or yarn)
 - **Database**: Currently configured for SQL Server (not MySQL)
 - **Case Sensitivity**: Backend uses snake_case, frontend uses PascalCase
+- **Configuration**: **Always use config files** (`@/config`) instead of hardcoding values
+  - App metadata: `appConfig` from `app.config.ts`
+  - Routes: `mainRoutes`, `footerRoutes` from `routes.config.tsx`
+  - Colors/Theme: `colors`, `siderColorPalette`, `themeTokens` from `theme.config.ts`
+  - Layout sizes: `layoutConfig` from `layout.config.ts`
+  - API URLs: `apiConfig.baseUrl` from `api.config.ts`
+  - localStorage keys: `storageKeys` from `storage.config.ts`
 - **Static Methods**: Use `App.useApp()` hook for Ant Design messages/modals
-- **Theme Persistence**: All UI preferences saved to localStorage
+- **Theme Persistence**: All UI preferences saved to localStorage using config keys
 - **Authentication**: Windows Authentication expected when running under IIS
 - **Base Path**: API served at `/monitor` prefix
 - **CORS**: Frontend expected at `http://localhost:3000` in development

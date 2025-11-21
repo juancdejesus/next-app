@@ -4,23 +4,9 @@ import { Card, Select, Radio, Space, App } from 'antd';
 import AppLayout from '@/components/AppLayout';
 import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { siderColorPalette } from '@/config/theme.config';
+import { colors } from '@/config/theme.config';
 import '@/i18n/config';
-
-const BASE_COLORS = [
-  { name: 'Default Dark', value: '#001529' },
-  { name: 'Navy Blue', value: '#1e3a8a' },
-  { name: 'Deep Purple', value: '#4a148c' },
-  { name: 'Teal', value: '#004d40' },
-  { name: 'Forest Green', value: '#1b5e20' },
-  { name: 'Crimson', value: '#991b1b' },
-  { name: 'Slate', value: '#334155' },
-  { name: 'Indigo', value: '#312e81' },
-  { name: 'Olive', value: '#3f6212' },
-  { name: 'Maroon', value: '#7f1d1d' },
-  { name: 'Charcoal', value: '#2d2d2d' },
-  { name: 'Midnight Blue', value: '#121063' }
-  
-];
 
 export default function SettingsPage() {
   const { language, setLanguage, dateFormat, setDateFormat, siderColor, setSiderColor } = useTheme();
@@ -67,7 +53,7 @@ export default function SettingsPage() {
                   ]}
                 />
               </div>
-              <div style={{ marginTop: 8, color: '#8c8c8c', fontSize: 12 }}>
+              <div style={{ marginTop: 8, color: colors.text.secondary, fontSize: 12 }}>
                 {t('settings.language.description')}
               </div>
             </Card>
@@ -86,7 +72,7 @@ export default function SettingsPage() {
                   </Space>
                 </Radio.Group>
               </div>
-              <div style={{ marginTop: 8, color: '#8c8c8c', fontSize: 12 }}>
+              <div style={{ marginTop: 8, color: colors.text.secondary, fontSize: 12 }}>
                 {t('settings.dateFormat.description')}
               </div>
             </Card>
@@ -99,7 +85,7 @@ export default function SettingsPage() {
                 {t('settings.siderColor.label')}
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12, marginTop: 12 }}>
-                {BASE_COLORS.map((color) => (
+                {siderColorPalette.map((color) => (
                   <div
                     key={color.value}
                     onClick={() => handleSiderColorChange(color.value)}
@@ -107,7 +93,7 @@ export default function SettingsPage() {
                       cursor: 'pointer',
                       padding: 8,
                       borderRadius: 8,
-                      border: siderColor === color.value ? '3px solid #1677ff' : '2px solid #d9d9d9',
+                      border: siderColor === color.value ? `3px solid ${colors.border.active}` : `2px solid ${colors.border.default}`,
                       transition: 'all 0.3s',
                       textAlign: 'center',
                     }}
@@ -128,7 +114,7 @@ export default function SettingsPage() {
                 ))}
               </div>
             </div>
-            <div style={{ marginTop: 8, color: '#8c8c8c', fontSize: 12 }}>
+            <div style={{ marginTop: 8, color: colors.text.secondary, fontSize: 12 }}>
               {t('settings.siderColor.description')}
             </div>
           </Card>

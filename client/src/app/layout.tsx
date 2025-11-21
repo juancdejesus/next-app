@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ThemeProvider } from "../context/ThemeContext";
 import { UserProvider } from "../context/UserContext";
+import { appConfig } from "@/config/app.config";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Update Hub",
-  description: "Enterprise SaaS Data Management Platform",
+  title: appConfig.metadata.title,
+  description: appConfig.metadata.description,
 };
 
 export default function RootLayout({

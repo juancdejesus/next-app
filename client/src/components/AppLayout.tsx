@@ -6,15 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Layout, Menu, Avatar, Dropdown, Badge, Breadcrumb, theme } from 'antd';
 import { LayoutPanelLeft } from 'lucide-react';
 import {
-  DashboardOutlined,
-  CloudUploadOutlined,
-  FolderOpenOutlined,
-  CheckSquareOutlined,
-  FileTextOutlined,
-  SettingOutlined,
   QuestionCircleOutlined,
   BellOutlined,
-  AppstoreOutlined,
   GlobalOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -23,6 +16,10 @@ import { useTranslation } from 'react-i18next';
 import ThemeToggle from './ThemeToggle';
 import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
+import { mainRoutes, footerRoutes } from '@/config/routes.config';
+import { layoutConfig } from '@/config/layout.config';
+import { colors } from '@/config/theme.config';
+import { storageKeys } from '@/config/storage.config';
 import '../i18n/config';
 
 const { Header, Sider, Content } = Layout;
@@ -31,23 +28,11 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-// Menu route configuration
-const menuRoutes = [
-  { key: '/', icon: <DashboardOutlined />, labelKey: 'menu.dashboard' },
-  { key: '/upload', icon: <CloudUploadOutlined />, labelKey: 'menu.upload' },
-  { key: '/jobs', icon: <FolderOpenOutlined />, labelKey: 'menu.jobs' },
-  { key: '/approvals', icon: <CheckSquareOutlined />, labelKey: 'menu.approvals' },
-  { key: '/templates', icon: <FileTextOutlined />, labelKey: 'menu.templates' },
-  { key: '/items', icon: <AppstoreOutlined />, labelKey: 'menu.items' },
-  { key: '/users', icon: <UserOutlined />, labelKey: 'menu.users' },
-  { key: '/settings', icon: <SettingOutlined />, labelKey: 'menu.settings' },
-] as const;
-
 export default function AppLayout({ children }: AppLayoutProps) {
   // Initialize collapsed state from localStorage
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
-      const savedCollapsed = localStorage.getItem('siderCollapsed');
+      const savedCollapsed = localStorage.getItem(storageKeys.SIDER_COLLAPSED);
       return savedCollapsed === 'true';
     }
     return false;
@@ -64,17 +49,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // Save collapsed state to localStorage whenever it changes
   const handleCollapse = (value: boolean) => {
     setCollapsed(value);
-    localStorage.setItem('siderCollapsed', String(value));
+    localStorage.setItem(storageKeys.SIDER_COLLAPSED, String(value));
   };
 
   // Map pathname to translation key
   const getPageTitleKey = (path: string): string => {
-    const route = menuRoutes.find(r => r.key === path);
+    const route = mainRoutes.find(r => r.key === path);
     return route?.labelKey || 'menu.help';
   };
 
   // Build menu items from route configuration
-  const menuItems: MenuProps['items'] = menuRoutes.map(route => ({
+  const menuItems: MenuProps['items'] = mainRoutes.map(route => ({
     key: route.key,
     icon: route.icon,
     label: t(route.labelKey),
@@ -127,7 +112,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         collapsed={collapsed}
         onCollapse={handleCollapse}
         theme="dark"
-        width={200}
+        width={layoutConfig.sider.width}
+        collapsedWidth={layoutConfig.sider.collapsedWidth}
         style={{
           overflow: 'auto',
           height: '100vh',
@@ -142,7 +128,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div
           onClick={() => collapsed && handleCollapse(false)}
           style={{
-            height: 64,
+            height: layoutConfig.header.height,
             margin: 16,
             display: 'flex',
             alignItems: 'center',
@@ -154,7 +140,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             style={{
               width: 32,
               height: 32,
-              background: '#1677ff',
+              background: colors.primary,
               borderRadius: 8,
               display: 'flex',
               alignItems: 'center',
@@ -163,7 +149,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
               marginLeft: 10
             }}
           >
-            {/* <DatabaseOutlined style={{ color: 'white', fontSize: 18 }} /> */}
             <LayoutPanelLeft style={{ color: 'white', fontSize: 18 }} />
           </div>
           <h1
@@ -194,29 +179,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <Menu
             theme="dark"
             mode="inline"
-            selectedKeys={pathname === '/help' ? ['/help'] : []}
-            items={[
-              {
-                key: '/help',
-                icon: <QuestionCircleOutlined />,
-                label: t('menu.help'),
-                onClick: () => router.push('/help'),
-              },
-            ]}
+            selectedKeys={footerRoutes.some(r => r.key === pathname) ? [pathname] : []}
+            items={footerRoutes.map(route => ({
+              key: route.key,
+              icon: route.icon,
+              label: t(route.labelKey),
+              onClick: () => router.push(route.key),
+            }))}
             style={{ userSelect: 'none', backgroundColor: siderColor }}
           />
         </div>
       </Sider>
-      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'all 0.2s' }}>
+      <Layout style={{ marginLeft: collapsed ? layoutConfig.sider.collapsedWidth : layoutConfig.sider.width, transition: 'all 0.2s' }}>
         <Header
           style={{
-            padding: '0 24px',
+            padding: `0 ${layoutConfig.header.padding}px`,
             background: colorBgContainer,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: '1px solid #f0f0f0',
-            
+            borderBottom: `1px solid ${colors.border.light}`,
           }}
         >
           <Breadcrumb
@@ -232,7 +214,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           />
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, userSelect: 'none', }}>
             <ThemeToggle />
-            <Badge count={5}>
+            <Badge count={layoutConfig.badge.notificationCount}>
               <BellOutlined style={{ fontSize: 20, cursor: 'pointer' }} />
             </Badge>
             <QuestionCircleOutlined style={{ fontSize: 20, cursor: 'pointer' }} />
@@ -242,7 +224,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   <>
                     <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
                       <div style={{ fontWeight: 600, fontSize: 14 }}>{currentUser.Name || t('user.name')}</div>
-                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>{currentUser.Role || t('user.role')}</div>
+                      <div style={{ fontSize: 12, color: colors.text.secondary }}>{currentUser.Role || t('user.role')}</div>
                     </div>
                     <Avatar
                       src={currentUser.PhotoURL}
@@ -254,7 +236,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   <>
                     <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
                       <div style={{ fontWeight: 600, fontSize: 14 }}>{t('user.name')}</div>
-                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>{t('user.role')}</div>
+                      <div style={{ fontSize: 12, color: colors.text.secondary }}>{t('user.role')}</div>
                     </div>
                     <Avatar icon={<UserOutlined />} />
                   </>
@@ -263,7 +245,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   <>
                     <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
                       <div style={{ fontWeight: 600, fontSize: 14 }}>...</div>
-                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>...</div>
+                      <div style={{ fontSize: 12, color: colors.text.secondary }}>...</div>
                     </div>
                     <Avatar icon={<UserOutlined />} />
                   </>
@@ -275,8 +257,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <Content
           style={{
             margin: 0,
-            padding: 24,
-            minHeight: 280,
+            padding: layoutConfig.content.padding,
+            minHeight: layoutConfig.content.minHeight,
             background: colorBgLayout,
             borderRadius: borderRadiusLG,
           }}
