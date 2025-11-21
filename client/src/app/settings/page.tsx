@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Select, Radio, Space, App } from 'antd';
+import { Card, Select, Space, App } from 'antd';
 import AppLayout from '@/components/AppLayout';
 import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -65,15 +65,15 @@ export default function SettingsPage() {
                 <label style={{ fontWeight: 500, marginBottom: 8, display: 'block' }}>
                   {t('settings.dateFormat.label')}
                 </label>
-                <Radio.Group value={dateFormat} onChange={(e) => handleDateFormatChange(e.target.value)}>
-                  <Space direction="vertical">
-                    {dateFormats.map((format) => (
-                      <Radio key={format.value} value={format.value}>
-                        {format.label} ({format.example})
-                      </Radio>
-                    ))}
-                  </Space>
-                </Radio.Group>
+                <Select
+                  value={dateFormat}
+                  onChange={handleDateFormatChange}
+                  style={{ width: '100%' }}
+                  options={dateFormats.map((format) => ({
+                    label: `${format.label} (${format.example})`,
+                    value: format.value,
+                  }))}
+                />
               </div>
               <div style={{ marginTop: 8, color: colors.text.secondary, fontSize: 12 }}>
                 {t('settings.dateFormat.description')}
