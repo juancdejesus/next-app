@@ -4,9 +4,10 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { App, ConfigProvider, theme as antdTheme } from 'antd';
 import { storageKeys } from '@/config/storage.config';
 import { colors as themeColors, themeTokens } from '@/config/theme.config';
+import { defaultDateFormat } from '@/config/i18n.config';
 
 type Theme = 'light' | 'dark';
-type DateFormat = 'yyyy-mm-dd' | 'dd/mm/yyyy' | 'mm/dd/yyyy';
+type DateFormat = 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'DD.MM.YYYY';
 type Language = 'en' | 'es';
 
 interface ThemeContextType {
@@ -37,7 +38,7 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('light');
   const [language, setLanguageState] = useState<Language>('en');
-  const [dateFormat, setDateFormatState] = useState<DateFormat>('yyyy-mm-dd');
+  const [dateFormat, setDateFormatState] = useState<DateFormat>(defaultDateFormat);
   const [siderColor, setSiderColorState] = useState<string>(themeColors.defaultSider);
   const [mounted, setMounted] = useState(false);
 

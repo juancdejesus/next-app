@@ -6,6 +6,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { siderColorPalette } from '@/config/theme.config';
 import { colors } from '@/config/theme.config';
+import { dateFormats } from '@/config/i18n.config';
 import '@/i18n/config';
 
 export default function SettingsPage() {
@@ -19,7 +20,7 @@ export default function SettingsPage() {
     message.success(t('settings.languageChanged'));
   };
 
-  const handleDateFormatChange = (value: 'yyyy-mm-dd' | 'dd/mm/yyyy' | 'mm/dd/yyyy') => {
+  const handleDateFormatChange = (value: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'DD.MM.YYYY') => {
     setDateFormat(value);
     message.success(t('settings.dateFormatChanged'));
   };
@@ -66,9 +67,11 @@ export default function SettingsPage() {
                 </label>
                 <Radio.Group value={dateFormat} onChange={(e) => handleDateFormatChange(e.target.value)}>
                   <Space direction="vertical">
-                    <Radio value="yyyy-mm-dd">YYYY-MM-DD (2025-11-15)</Radio>
-                    <Radio value="dd/mm/yyyy">DD/MM/YYYY (15/11/2025)</Radio>
-                    <Radio value="mm/dd/yyyy">MM/DD/YYYY (11/15/2025)</Radio>
+                    {dateFormats.map((format) => (
+                      <Radio key={format.value} value={format.value}>
+                        {format.label} ({format.example})
+                      </Radio>
+                    ))}
                   </Space>
                 </Radio.Group>
               </div>
