@@ -31,31 +31,17 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-// Map routes to menu keys
-const routeToKeyMap: Record<string, string> = {
-  '/': '1',
-  '/upload': '2',
-  '/jobs': '3',
-  '/approvals': '4',
-  '/templates': '5',
-  '/items': '6',
-  '/users': '7',
-  '/settings': '8',
-  '/help': 'help',
-};
-
-// Map menu keys to routes
-const keyToRouteMap: Record<string, string> = {
-  '1': '/',
-  '2': '/upload',
-  '3': '/jobs',
-  '4': '/approvals',
-  '5': '/templates',
-  '6': '/items',
-  '7': '/users',
-  '8': '/settings',
-  'help': '/help',
-};
+// Menu route configuration
+const menuRoutes = [
+  { key: '/', icon: <DashboardOutlined />, labelKey: 'menu.dashboard' },
+  { key: '/upload', icon: <CloudUploadOutlined />, labelKey: 'menu.upload' },
+  { key: '/jobs', icon: <FolderOpenOutlined />, labelKey: 'menu.jobs' },
+  { key: '/approvals', icon: <CheckSquareOutlined />, labelKey: 'menu.approvals' },
+  { key: '/templates', icon: <FileTextOutlined />, labelKey: 'menu.templates' },
+  { key: '/items', icon: <AppstoreOutlined />, labelKey: 'menu.items' },
+  { key: '/users', icon: <UserOutlined />, labelKey: 'menu.users' },
+  { key: '/settings', icon: <SettingOutlined />, labelKey: 'menu.settings' },
+] as const;
 
 export default function AppLayout({ children }: AppLayoutProps) {
   // Initialize collapsed state from localStorage
@@ -83,81 +69,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   // Map pathname to translation key
   const getPageTitleKey = (path: string): string => {
-    const keyMap: Record<string, string> = {
-      '/': 'menu.dashboard',
-      '/upload': 'menu.upload',
-      '/jobs': 'menu.jobs',
-      '/approvals': 'menu.approvals',
-      '/templates': 'menu.templates',
-      '/items': 'menu.items',
-      '/users': 'menu.users',
-      '/settings': 'menu.settings',
-      '/help': 'menu.help',
-    };
-    return keyMap[path] || 'menu.dashboard';
+    const route = menuRoutes.find(r => r.key === path);
+    return route?.labelKey || 'menu.help';
   };
 
-  // Get the selected key directly from pathname - no state needed
-  const selectedKey = routeToKeyMap[pathname] || '1';
-
-  // Handle menu click
-  const handleMenuClick = (key: string) => {
-    const route = keyToRouteMap[key];
-    if (route) {
-      router.push(route);
-    }
-  };
-
-  const menuItems: MenuProps['items'] = [
-    {
-      key: '1',
-      icon: <DashboardOutlined />,
-      label: t('menu.dashboard'),
-      onClick: () => handleMenuClick('1'),
-    },
-    {
-      key: '2',
-      icon: <CloudUploadOutlined />,
-      label: t('menu.upload'),
-      onClick: () => handleMenuClick('2'),
-    },
-    {
-      key: '3',
-      icon: <FolderOpenOutlined />,
-      label: t('menu.jobs'),
-      onClick: () => handleMenuClick('3'),
-    },
-    {
-      key: '4',
-      icon: <CheckSquareOutlined />,
-      label: t('menu.approvals'),
-      onClick: () => handleMenuClick('4'),
-    },
-    {
-      key: '5',
-      icon: <FileTextOutlined />,
-      label: t('menu.templates'),
-      onClick: () => handleMenuClick('5'),
-    },
-    {
-      key: '6',
-      icon: <AppstoreOutlined />,
-      label: t('menu.items'),
-      onClick: () => handleMenuClick('6'),
-    },
-    {
-      key: '7',
-      icon: <UserOutlined />,
-      label: t('menu.users'),
-      onClick: () => handleMenuClick('7'),
-    },
-    {
-      key: '8',
-      icon: <SettingOutlined />,
-      label: t('menu.settings'),
-      onClick: () => handleMenuClick('8'),
-    },
-  ];
+  // Build menu items from route configuration
+  const menuItems: MenuProps['items'] = menuRoutes.map(route => ({
+    key: route.key,
+    icon: route.icon,
+    label: t(route.labelKey),
+    onClick: () => router.push(route.key),
+  }));
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -263,7 +185,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
         <Menu
           theme="dark"
-          selectedKeys={[selectedKey]}
+          selectedKeys={[pathname]}
           mode="inline"
           items={menuItems}
           style={{ backgroundColor: siderColor }}
@@ -272,13 +194,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <Menu
             theme="dark"
             mode="inline"
-            selectedKeys={selectedKey === 'help' ? ['help'] : []}
+            selectedKeys={pathname === '/help' ? ['/help'] : []}
             items={[
               {
-                key: 'help',
+                key: '/help',
                 icon: <QuestionCircleOutlined />,
                 label: t('menu.help'),
-                onClick: () => handleMenuClick('help'),
+                onClick: () => router.push('/help'),
               },
             ]}
             style={{ userSelect: 'none', backgroundColor: siderColor }}
