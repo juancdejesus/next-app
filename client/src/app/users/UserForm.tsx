@@ -1,4 +1,4 @@
-import { Modal, Form, Select, Button, Row, Col, Card, Avatar, Typography, Space } from 'antd';
+import { Modal, Form, Select, Button, Row, Col, Card, Avatar, Typography, Space, theme } from 'antd';
 import { UserOutlined, SolutionOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import { fetchRoles } from '@/services/userService';
 import { fetchEmployeesWithoutAccess } from '@/services/employeeService';
 
 const { Text } = Typography;
+const { useToken } = theme;
 
 interface UserFormProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface UserFormProps {
 
 export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProps) => {
   const { t } = useTranslation();
+  const { token } = useToken();
   const [form] = Form.useForm();
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -131,7 +133,7 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
 
             {/* Employee Preview Card */}
             {selectedEmployee && (
-              <Card style={{ marginBottom: 24, backgroundColor: '#fafafa' }}>
+              <Card style={{ marginBottom: 24, backgroundColor: token.colorBgContainer }}>
                 <Space size="middle">
                   <Avatar size={64} src={selectedEmployee.PhotoURL} icon={<UserOutlined />}>
                     {selectedEmployee.FirstName?.[0]}{selectedEmployee.LastName?.[0]}
@@ -162,7 +164,7 @@ export const UserForm = ({ open, editingUser, onCancel, onSubmit }: UserFormProp
 
         {/* Employee Info (read-only for editing) */}
         {editingUser && (
-          <Card style={{ marginBottom: 24, backgroundColor: '#f5f5f5' }}>
+          <Card style={{ marginBottom: 24, backgroundColor: token.colorBgContainer }}>
             <Space size="middle">
               <Avatar size={64} src={editingUser.PhotoURL} icon={<UserOutlined />}>
                 {editingUser.FirstName?.[0]}{editingUser.LastName?.[0]}
